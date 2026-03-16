@@ -75,6 +75,8 @@ xfce4-screenshooter -f -s ~/.openclaw/workspace/linux-desktop-control/images/des
     ...
   ]
 }}
+
+并将次json文件保存在 ~/.openclaw/workspace/linux-desktop-control/json/` 路径下并命名为 `{原始图片名称}_original.json`。
 ```
 
 ### 3. 坐标转换 (Coordinate Conversion)

@@ -75,6 +75,8 @@ You are a **top-tier browser desktop UI element detection expert**, specializing
     ...
   ]
 }}
+
+And save this json file to `~/.openclaw/workspace/linux-desktop-control/json/` path naming it `{original_image_name}_original.json`.
 ```
 
 ### 3. Coordinate Conversion
