@@ -109,3 +109,12 @@ python3 scripts/keyboard_control.py lines --file script.py --line-interval 0.8 -
 # Type multiple lines of text directly
 python3 scripts/keyboard_control.py lines --text "First line\nSecond line with emoji 😺\nThird line end" --line-interval 1.0
 ```
+
+### 6. Verification
+After performing an action (mouse click or keyboard input), **YOU MUST verify the result**.
+
+**Steps:**
+1. Take another screenshot (refer to Step 1).
+2. Analyze the new screenshot to confirm if the expected change occurred (e.g., window opened, text typed, button clicked).
+3. If the action failed or the result is unexpected, retry or adjust the strategy.
+

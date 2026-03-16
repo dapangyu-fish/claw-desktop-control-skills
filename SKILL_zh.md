@@ -109,3 +109,11 @@ python3 scripts/keyboard_control.py lines --file script.py --line-interval 0.8 -
 # 直接输入多行文本
 python3 scripts/keyboard_control.py lines --text "第一行\n第二行有 emoji 😺\n第三行結束" --line-interval 1.0
 ```
+
+### 6. 验证 (Verification)
+执行完操作（鼠标点击或键盘输入）后，**必须验证结果**。
+
+**步骤：**
+1. 再次截图（参考步骤 1）。
+2. 分析新截图以确认预期变化是否发生（例如：窗口是否打开、文字是否输入、按钮是否点击）。
+3. 如果操作失败或结果不符合预期，请重试或调整策略。
