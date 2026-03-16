@@ -43,10 +43,10 @@ xfce4-screenshooter -f -s ~/.openclaw/workspace/linux-desktop-control/images/des
 ```bash
 ./scripts/ui_detect_prompt.sh ~/.openclaw/workspace/linux-desktop-control/images/{图片名称}.png
 ```
-脚本会自动在 `~/.openclaw/workspace/linux-desktop-control/json/` 路径下生成命名为 `{原始图片名称}_original.json` 的文件。
+脚本会自动在 `~/.openclaw/workspace/linux-desktop-control/json/` 路径下生成命名为 `{原始图片名称（不带后缀）}_original.json` 的文件。
 
 ### 3. 坐标转换 (Coordinate Conversion)
-此前子agent生成的 json 文件需要保存在 `~/.openclaw/workspace/linux-desktop-control/json/` 路径下并命名为 `{原始图片名称}_original.json`。
+此前子agent生成的 json 文件需要保存在 `~/.openclaw/workspace/linux-desktop-control/json/` 路径下并命名为 `{原始图片名称（不带后缀）}_original.json`。
 此时坐标是归一化之前的，需要换算成绝对坐标，调用脚本 `coordinate_conversion.py`。
 
 **注意**：`coordinate_conversion.py` 需要引用 `./NotoSansSC-VariableFont_wght.ttf` (位于 skill 路径下)。
@@ -54,9 +54,9 @@ xfce4-screenshooter -f -s ~/.openclaw/workspace/linux-desktop-control/images/des
 **调用方法：**
 ```bash
 python3 scripts/coordinate_conversion.py \
-  --input=~/.openclaw/workspace/linux-desktop-control/json/{原始图片名称}_original.json \
-  --output=~/.openclaw/workspace/linux-desktop-control/json/{原始图片名称}_converted.json \
-  --tag_image=~/.openclaw/workspace/linux-desktop-control/json/{原始图片名称}_export.json
+  --input=~/.openclaw/workspace/linux-desktop-control/json/{原始图片名称（不带后缀）}_original.json \
+  --output=~/.openclaw/workspace/linux-desktop-control/json/{原始图片名称（不带后缀）}_converted.json \
+  --tag_image=~/.openclaw/workspace/linux-desktop-control/json/{原始图片名称（不带后缀）}_export.json
 ```
 - `--input`: 输入的原始的归一化坐标的 json
 - `--output`: 输出绝对值化坐标的 json

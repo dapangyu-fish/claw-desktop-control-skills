@@ -27,7 +27,7 @@ fi
 
 # ==================== 自动生成 JSON 文件名 ====================
 IMAGE_BASENAME=$(basename "$IMAGE_PATH")
-JSON_NAME="${IMAGE_BASENAME%.png}_original.json"   # 自动去掉 .png 并加上 _original.json
+JSON_NAME="${IMAGE_BASENAME%.*}_original.json"   # 自动去掉后缀（如.png）并加上 _original.json
 
 # 创建输出目录
 mkdir -p "$HOME/.openclaw/workspace/linux-desktop-control/json"
