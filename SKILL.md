@@ -13,6 +13,9 @@ This skill allows controlling desktop applications and performing system operati
 
 ## Workflow
 
+**⚠️ CRITICAL RULE for Agent:**
+Unless the user explicitly provides coordinates or specific keyboard/mouse instructions, **YOU MUST ALWAYS take a screenshot and analyze UI elements (Steps 1 to 3) FIRST** before executing any mouse or keyboard commands. Do NOT guess coordinates. Ensure the target app has focus before interacting.
+
 ### 0. Initialization
 Run the setup script to prepare the workspace and verify the environment.
 
