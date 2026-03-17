@@ -101,7 +101,7 @@ python3 scripts/keyboard_control.py hotkey win r
 # 3 输入单行文字（type）—— 最常用
 python3 scripts/keyboard_control.py type "你好世界！👋 Hello 123"
 python3 scripts/keyboard_control.py type "登录成功" --enter
-python3 scripts/keyboard_control.py type 'print("成功绕过输入法！")' --enter
+python3 scripts/keyboard_control.py type 'https://www.google.com' --enter
 python3 scripts/keyboard_control.py type "超长文本测试：ABC123 + emoji 👋 + 特殊符号 @#$%" --enter
 
 # 4 多行文字输入（lines）—— 推荐贴代码

@@ -88,7 +88,7 @@ python3 scripts/keyboard_control.py hotkey win r
 # Type Text (Single Line) - Recommended
 python3 scripts/keyboard_control.py type "Hello World! 👋 123"
 python3 scripts/keyboard_control.py type "Login Successful" --enter
-python3 scripts/keyboard_control.py type 'print("Bypassed IME!")' --enter
+python3 scripts/keyboard_control.py type 'https://www.google.com' --enter
 python3 scripts/keyboard_control.py type "Long text test: ABC123 + emoji 👋 + symbols @#$%" --enter
 
 # Type Multiple Lines (lines) - Best for Code
