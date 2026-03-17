@@ -27,14 +27,19 @@ fi
 
 # ==================== 自动生成 JSON 文件名 ====================
 IMAGE_BASENAME=$(basename "$IMAGE_PATH")
-JSON_NAME="${IMAGE_BASENAME%.*}_original.json"   # 自动去掉后缀（如.png）并加上 _original.json
+EXPORT_IMAGE_NAME="${IMAGE_BASENAME%.*}_export.png" 
+ORIGINAL_JSON_NAME="${IMAGE_BASENAME%.*}_original.json" 
+CONVERTED_JSON_NAME="${IMAGE_BASENAME%.*}_converted.json" 
+EXPORT_IMAGE_PATH="${HOME}/openclaw/workspace/linux-desktop-control/images/${EXPORT_IMAGE_NAME}"
+ORIGINAL_JSON_PATH="${HOME}/openclaw/workspace/linux-desktop-control/json/${ORIGINAL_JSON_NAME}"
+CONVERTED_JSON_PATH="${HOME}/openclaw/workspace/linux-desktop-control/json/${CONVERTED_JSON_NAME}"
 
 # 创建输出目录
 mkdir -p "$HOME/.openclaw/workspace/linux-desktop-control/json"
 
 echo "🚀 正在调用 openclaw agent 进行 UI 检测..."
 echo "   图片: $IMAGE_PATH"
-echo "   输出: ~/.openclaw/workspace/linux-desktop-control/json/$JSON_NAME"
+echo "   输出: ~/.openclaw/workspace/linux-desktop-control/json/$ORIGINAL_JSON_NAME"
 
 # 完整 Prompt（零临时文件，直接 heredoc）
 openclaw agent --agent linux-desktop-control-ui-detect --message "$(cat << EOF
@@ -74,12 +79,12 @@ openclaw agent --agent linux-desktop-control-ui-detect --message "$(cat << EOF
 命令使用方法： 
 
 python3 scripts/coordinate_conversion.py \
-    --input=~/.openclaw/workspace/linux-desktop-control/json/${JSON_NAME} \
-    --output=~/.openclaw/workspace/linux-desktop-control/json/${IMAGE_BASENAME%.*}_converted.json \
-    --tag_image=~/.openclaw/workspace/linux-desktop-control/json/{原始图片名称（不带后缀）}_export.json
+    --input=${ORIGINAL_JSON_PATH} \
+    --output=${CONVERTED_JSON_PATH} \
+    --tag_image=${EXPORT_IMAGE_PATH}
 
 EOF
 )"
 
 echo "✅ 执行完成！"
-echo "   JSON 文件已自动保存为：~/.openclaw/workspace/linux-desktop-control/json/${JSON_NAME}"
+echo "JSON 文件已自动保存为：~/.openclaw/workspace/linux-desktop-control/json/${CONVERTED_JSON_NAME}"
