@@ -13,10 +13,11 @@ This skill allows controlling desktop applications and performing system operati
 
 ## Core Workflow: OODA Loop (Observe-Orient-Decide-Act)
 
-**⚠️ CRITICAL RULE for Agent:**
-This Skill is a **Closed-Loop Control System**, not a linear script.
-**You MUST strictly follow the "Screenshot -> Analyze -> Decide -> Act -> Verify" loop** until the final goal is achieved.
-**DO NOT generate code for all steps at once! You MUST "take one step, look once".**
+**⚠️ CRITICAL RULES for Agent:**
+1. **Closed-Loop Control**: This Skill MUST function like a human using a computer, **strictly following the "Screenshot -> Analyze -> Decide -> Act -> Verify" single-step loop**.
+2. **State-Driven**: **Every decision MUST be based on the current REAL screen state**, not on pre-conceived scripts or assumptions.
+3. **Atomic Action**: **Execute ONLY ONE atomic action at a time** (e.g., "Click Search Bar"), then IMMEDIATELY re-verify. **Generating multi-step code at once is STRICTLY FORBIDDEN!**
+4. **Verify or Die**: If the previous action failed to produce the expected screen change (e.g., window didn't open, input box didn't focus), **STOP the current path IMMEDIATELY, retry, or change strategy**. Do not pretend to succeed and continue.
 
 ### Phase 0: Initialization
 Run the setup script to prepare the workspace and verify the environment.
@@ -27,11 +28,13 @@ Run the setup script to prepare the workspace and verify the environment.
 ```
 
 ### Phase 1: Observe & Verify
-**This step MUST be executed before EVERY action!**
+**This step MUST be executed before EVERY action! This is the starting point of the loop.**
+
 1. **Screenshot**: Capture the current screen state.
    ```bash
    xfce4-screenshooter -f -s ~/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_$(date +%Y%m%d_%H%M%S).png
    ```
+
 2. **Analyze**: Use `ui_detect_prompt.sh` to analyze UI elements.
    ```bash
    ./scripts/ui_detect_prompt.sh ~/.openclaw/workspace/linux-desktop-control/images/{original_image_name}.png
@@ -46,49 +49,41 @@ Run the setup script to prepare the workspace and verify the environment.
      --tag_image=~/.openclaw/workspace/linux-desktop-control/json/{original_image_name_without_extension}_export.json
    ```
 
-4. **Self-Correction & Verification**:
-   - **If this is the first step**: Skip verification and proceed to Phase 2.
-   - **If an action was just performed**: Compare the **before** and **after** screenshots/UI data.
-     - *Ask yourself: "Did the last action work? Is the window open? Is there text in the input box?"*
-     - **If failed**: Stop the current plan, analyze the cause, and try an alternative (e.g., keyboard shortcut instead of click, or re-target coordinates).
-     - **If successful**: Proceed to the next step.
+4. **State Assertion & Self-Correction**:
+   - **If starting a task**: Verify the initial state (e.g., is the desktop visible?).
+   - **If an action was just performed**: **COMPARE screenshots/UI data before and after the action**.
+     - *Example: Last step was "Open Browser". Is there a browser window on screen now? If not, action FAILED.*
+     - *Example: Last step was "Click Search Box". Is the input method active? Is there a cursor? If not, action FAILED.*
+     - **Handling Failure**: If assertion fails, **DO NOT proceed to the next step**! Analyze the cause (e.g., click unresponsive, slow loading), try retrying, increasing wait time, or using keyboard shortcuts.
 
 ### Phase 2: Plan & Decide
-1. **Assess Current State**: Based on Phase 1 results, determine how far you are from the final goal.
-2. **Formulate Next Step**: **Plan ONLY the NEXT 1 atomic action** (e.g., "Click Search Bar").
-   - **DO NOT** plan subsequent "Type text" or "Press Enter" because you don't know if "Click Search Bar" succeeded yet.
+1. **Assess Current State**: Based on Phase 1's REAL state, determine the distance to the final goal.
+2. **Formulate Next Step**: **Plan ONLY the NEXT 1 atomic action**.
+   - *Wrong*: "Click Search Bar -> Wait -> Type 'Lark' -> Enter". (This is scripting, FORBIDDEN!)
+   - *Right*: "Current state: Search Bar not focused -> Plan: Click Search Bar at (x,y)". (Execute, then return to Phase 1 to verify focus, THEN plan typing).
 3. **Get Target Coordinates**: Find the target element's `bbox` center `(x, y)` from `_converted.json`.
 
 ### Phase 3: Act
 1. **Execute Action**: Use `mouse_control.py` or `keyboard_control.py` to execute a **SINGLE** action.
-2. **Wait for Response**: Allow system reaction time after an action (e.g., wait 1-2 seconds), usually implied in scripts or requires explicit `sleep`.
+2. **Wait for Response**: Allow system reaction time (e.g., 2-5 seconds depending on app speed), usually implied in scripts or requires explicit `sleep`.
 
 **Tools Reference:**
-
-#### Mouse Control
-```bash
-# Click
-python3 scripts/mouse_control.py click 300 400
-# Double Click
-python3 scripts/mouse_control.py double 500 300 --duration 0.4
-# Drag
-python3 scripts/mouse_control.py drag 100 100 400 400 --duration 1.2
-# Right Click
-python3 scripts/mouse_control.py right 600 500
-# Scroll
-python3 scripts/mouse_control.py scroll 200 200 -300
-```
-
-#### Keyboard Control
-```bash
-# Press Key
-python3 scripts/keyboard_control.py press enter
-# Hotkey
-python3 scripts/keyboard_control.py hotkey ctrl c
-# Type Text
-python3 scripts/keyboard_control.py type "Hello World!" --interval 0.05
-```
+*(See below for command examples)*
 
 ### Phase 4: Loop
-- **Return to Phase 1** until the task is completed.
+- **Return to Phase 1**, untill the "Definition of Done" is met.
+
+## Definition of Done (DoD)
+The Agent can ONLY declare the task complete when:
+1. **Final Goal Achieved**: A clear success indicator appears on screen (e.g., "Installation Complete" message, target app opened and showing home page).
+2. **Verification Passed**: The last screenshot MUST contain visual evidence of success.
+3. **Clean State**: All intermediate temporary windows (e.g., package manager) are closed (if required).
+
+## Error Handling & Retry Strategy
+1. **Element Not Found**: If the target element is missing in JSON, try scrolling or checking other tabs/windows.
+2. **Action Unresponsive**: If screen doesn't change after clicking:
+   - Check if Double Click is needed.
+   - Check if Right Click menu is needed.
+   - Try Keyboard Shortcuts (e.g., `Ctrl+L` for address bar, `Super` key for menu).
+3. **App Not Starting**: If clicking an icon fails, try launching via command line (`RunCommand`) as a fallback.
 
