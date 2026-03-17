@@ -66,7 +66,7 @@ openclaw agent --json --agent linux-desktop-control-ui-detect --message "$(cat <
 
     **bbox精度铁律**（最关键，解决定位不准）：
     - 每个bbox必须**紧密包围元素视觉边界**（tight bounding box），padding最多5%，既不留大量空白也不裁切内容。
-    - 坐标严格归一化到0~1000整数：`x = round((pixel_x / 图片宽度) * 1000)`，同理y。
+    - 坐标严格归一化到0~1000整数：\`x = round((pixel_x / 图片宽度) * 1000)\`，同理y。
     - 保证 x1 < x2、y1 < y2，所有值在0~1000范围内。
 
     **text命名规则**（必须全局唯一）：
