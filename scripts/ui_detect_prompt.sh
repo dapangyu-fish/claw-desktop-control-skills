@@ -79,7 +79,8 @@ openclaw agent --json --agent linux-desktop-control-ui-detect --message "$(cat <
       "objects": [
         {{"text": "唯一描述", "bbox": [x1, y1, x2, y2]}},
         ...
-      ]
+      ],
+      "description": "对图片进行整体描述"
     }}
 
 
