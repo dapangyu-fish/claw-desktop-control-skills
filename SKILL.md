@@ -49,11 +49,17 @@ Run the setup script to prepare the workspace and verify the environment.
      - **Handling Failure**: If assertion fails, **DO NOT proceed to the next step**! Analyze the cause (e.g., click unresponsive, slow loading), try retrying, increasing wait time, or using keyboard shortcuts.
 
 ### Phase 2: Plan & Decide
+**⚠️ You MUST use the `TodoWrite` tool to explicitly output your thinking process and next steps!**
+
 1. **Assess Current State**: Based on Phase 1's REAL state, determine the distance to the final goal.
-2. **Formulate Next Step**: **Plan ONLY the NEXT 1 atomic action**.
+2. **Update Todo List**:
+   - Mark completed steps as `completed`.
+   - **Add** the next 1 atomic action as an `in_progress` task.
+   - Keep the Todo list clean and visible so the user knows what you are doing.
+3. **Formulate Next Step**: **Plan ONLY the NEXT 1 atomic action**.
    - *Wrong*: "Click Search Bar -> Wait -> Type 'Lark' -> Enter". (This is scripting, FORBIDDEN!)
    - *Right*: "Current state: Search Bar not focused -> Plan: Click Search Bar at (x,y)". (Execute, then return to Phase 1 to verify focus, THEN plan typing).
-3. **Get Target Coordinates**: Find the target element's `bbox` center `(x, y)` from `_converted.json`.
+4. **Get Target Coordinates**: Find the target element's `bbox` center `(x, y)` from `_converted.json`.
 
 ### Phase 3: Act
 1. **Execute Action**: Use `mouse_control.py` or `keyboard_control.py` to execute a **SINGLE** action.
