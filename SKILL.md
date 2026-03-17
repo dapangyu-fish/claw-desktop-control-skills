@@ -58,7 +58,7 @@ Run the setup script to prepare the workspace and verify the environment.
 
 ### Phase 2: Plan Next Action
 **⚠️ You MUST use the `TodoWrite` tool to explicitly output your thinking process and next steps!**
-**⚠️ Before performing any action, you MUST announce to the user what you are about to do in the chat.**
+**⚠️ Before performing any action, you MUST announce to the user what you are about to do in the chat, AND you MUST output the exact bash command you are going to execute!**
 
 1. **Assess Current State**: Based on Phase 1's REAL state, determine the distance to the final goal.
 2. **Update Todo List**:
