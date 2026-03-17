@@ -8,7 +8,7 @@
 # ================================================
 
 if [ "$#" -ne 2 ]; then
-    echo "正确用法: $0 <screenshot_path> <request_prompt>"
+    echo "正确用法: $0 <screenshot_path> <request_prompt> <display>"
     echo ""
     echo "示例:"
     echo "  $0 /home/fish/.openclaw/workspace/linux-desktop-control/images/desktop_screenshot_20260316_203530.png \"Please find the search bar\""
@@ -18,6 +18,7 @@ fi
 # 参数
 IMAGE_PATH="$1"
 REQUEST_PROMPT="$2"
+DISPLAY="$3"
 
 # 检查图片是否存在
 if [ ! -f "$IMAGE_PATH" ]; then
@@ -38,5 +39,9 @@ echo "🚀 分析下一步动作..."
 # 完整 Prompt（零临时文件，直接 heredoc）
 openclaw agent --agent linux-desktop-control-ui-detect --message "$(cat << EOF
 /new 请分析下这张图${IMAGE_PATH}，你可以参考一份JSON文件：${CONVERTED_JSON_PATH}，内含图片中一些可见的UI元素，我现在需要根据请求提示：${REQUEST_PROMPT}，分析下一步动作。
+注意:当前显示的窗口是：${DISPLAY}
+你可以根据 ${HOME}/.openclaw/workspace/skills/claw-desktop-control-skills/scripts 中的脚本，来执行下一步动作，可参考 ${HOME}/.openclaw/workspace/skills/claw-desktop-control-skills 的说明。
+
 EOF
 )" 
+
