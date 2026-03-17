@@ -39,17 +39,9 @@ Run the setup script to prepare the workspace and verify the environment.
    ```bash
    ./scripts/ui_detect_prompt.sh ~/.openclaw/workspace/linux-desktop-control/images/{original_image_name}.png
    ```
-   *(The script automatically generates `{original_image_name_without_extension}_original.json`)*
+   *(The script automatically generates `{original_image_name_without_extension}_converted.json` with absolute coordinates)*
 
-3. **Coordinate Conversion**: Convert normalized coordinates to absolute coordinates.
-   ```bash
-   python3 scripts/coordinate_conversion.py \
-     --input=~/.openclaw/workspace/linux-desktop-control/json/{original_image_name_without_extension}_original.json \
-     --output=~/.openclaw/workspace/linux-desktop-control/json/{original_image_name_without_extension}_converted.json \
-     --tag_image=~/.openclaw/workspace/linux-desktop-control/json/{original_image_name_without_extension}_export.json
-   ```
-
-4. **State Assertion & Self-Correction**:
+3. **State Assertion & Self-Correction based on converted.json**:
    - **If starting a task**: Verify the initial state (e.g., is the desktop visible?).
    - **If an action was just performed**: **COMPARE screenshots/UI data before and after the action**.
      - *Example: Last step was "Open Browser". Is there a browser window on screen now? If not, action FAILED.*

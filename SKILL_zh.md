@@ -39,17 +39,9 @@ description: "通过Python脚本模拟键盘鼠标并控制桌面应用程序并
    ```bash
    ./scripts/ui_detect_prompt.sh ~/.openclaw/workspace/linux-desktop-control/images/{图片名称}.png
    ```
-   *(脚本会自动生成 `{原始图片名称（不带后缀）}_original.json`)*
+   *(脚本会自动生成 绝对值坐标化的 `{原始图片名称（不带后缀）}_converted.json`)*
 
-3. **坐标转换**：将归一化坐标转换为绝对坐标。
-   ```bash
-   python3 scripts/coordinate_conversion.py \
-     --input=~/.openclaw/workspace/linux-desktop-control/json/{原始图片名称（不带后缀）}_original.json \
-     --output=~/.openclaw/workspace/linux-desktop-control/json/{原始图片名称（不带后缀）}_converted.json \
-     --tag_image=~/.openclaw/workspace/linux-desktop-control/json/{原始图片名称（不带后缀）}_export.json
-   ```
-
-4. **状态断言 (State Assertion) & 自我修正**：
+3. **根据截图状态转换的converted.json 断言 (State Assertion) & 自我修正**：
    - **如果是任务开始**：确认起始状态（如桌面是否显示）。
    - **如果刚执行了操作**：**必须对比操作前后的截图/UI数据**。
      - *示例：上一步是“打开浏览器”。现在屏幕上有浏览器窗口吗？如果没有，操作失败。*
