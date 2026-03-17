@@ -41,7 +41,7 @@ Run the setup script to prepare the workspace and verify the environment.
    ```
    *(The script automatically generates `{original_image_name_without_extension}_converted.json` with absolute coordinates)*
 
-3. **Read and Output Findings, then Decide**:
+3. **Read and Output Findings, then attempt to execute the next step**:
    ```bash
    ./scripts/next_plan_prompt.sh ~/.openclaw/workspace/linux-desktop-control/images/{original_image_name}.png ${DISPLAY}
    ```
