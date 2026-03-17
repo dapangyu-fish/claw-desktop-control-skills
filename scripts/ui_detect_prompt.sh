@@ -79,7 +79,7 @@ openclaw agent --json --agent linux-desktop-control-ui-detect --message "$(cat <
 EOF
 )" 
 
-python3 ${HOME}/.openclaw/workspace/linux-desktop-control/scripts/coordinate_conversion.py \
+python3 ${HOME}/.openclaw/workspace/skills/claw-desktop-control-skills/scripts/coordinate_conversion.py \
     --input=${ORIGINAL_JSON_PATH} \
     --output=${CONVERTED_JSON_PATH} \
     --tag_image=${EXPORT_IMAGE_PATH}
