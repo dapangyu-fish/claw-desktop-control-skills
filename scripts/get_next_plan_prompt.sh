@@ -39,7 +39,7 @@ echo "🚀 分析下一步动作..."
 # 完整 Prompt（零临时文件，直接 heredoc）
 openclaw agent --agent linux-desktop-control-ui-detect --message "$(cat << EOF
 /new 请分析下这张图${IMAGE_PATH}，你可以参考一份JSON文件：${CONVERTED_JSON_PATH}，内含图片中一些可见的UI元素，我现在需要根据请求提示：${REQUEST_PROMPT}，分析下一步动作。
-注意:当前显示的窗口是：${DISPLAY}
+注意:export DISPLAY=${DISPLAY}
 你可以根据 ${HOME}/.openclaw/workspace/skills/claw-desktop-control-skills/scripts 中的脚本，来执行下一步动作，可参考 ${HOME}/.openclaw/workspace/skills/claw-desktop-control-skills 的说明。
 
 EOF
