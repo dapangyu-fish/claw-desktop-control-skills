@@ -71,7 +71,8 @@ openclaw agent --agent linux-desktop-control-ui-detect --message "$(cat << EOF
   "objects": [
     {"text": "唯一描述", "bbox": [x1, y1, x2, y2]},
     ...
-  ]
+  ],
+  "description": "对图片进行整体描述"
 }
 并将此JSON文件保存在 ~/.openclaw/workspace/linux-desktop-control/json/ 路径下并命名为 \`${JSON_NAME}\`。
 
