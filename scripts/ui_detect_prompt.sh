@@ -30,9 +30,9 @@ IMAGE_BASENAME=$(basename "$IMAGE_PATH")
 EXPORT_IMAGE_NAME="${IMAGE_BASENAME%.*}_annotated.png" 
 ORIGINAL_JSON_NAME="${IMAGE_BASENAME%.*}_original.json" 
 CONVERTED_JSON_NAME="${IMAGE_BASENAME%.*}_converted.json" 
-EXPORT_IMAGE_PATH="${HOME}/openclaw/workspace/linux-desktop-control/images/${EXPORT_IMAGE_NAME}"
-ORIGINAL_JSON_PATH="${HOME}/openclaw/workspace/linux-desktop-control/json/${ORIGINAL_JSON_NAME}"
-CONVERTED_JSON_PATH="${HOME}/openclaw/workspace/linux-desktop-control/json/${CONVERTED_JSON_NAME}"
+EXPORT_IMAGE_PATH="${HOME}/.openclaw/workspace/linux-desktop-control/images/${EXPORT_IMAGE_NAME}"
+ORIGINAL_JSON_PATH="${HOME}/.openclaw/workspace/linux-desktop-control/json/${ORIGINAL_JSON_NAME}"
+CONVERTED_JSON_PATH="${HOME}/.openclaw/workspace/linux-desktop-control/json/${CONVERTED_JSON_NAME}"
 
 # 创建输出目录
 mkdir -p "$HOME/.openclaw/workspace/linux-desktop-control/json"
@@ -42,7 +42,7 @@ echo "   图片: $IMAGE_PATH"
 echo "   输出: ~/.openclaw/workspace/linux-desktop-control/json/$ORIGINAL_JSON_NAME"
 
 # 完整 Prompt（零临时文件，直接 heredoc）
-openclaw agent --agent linux-desktop-control-ui-detect --message "$(cat << EOF
+openclaw agent --json --agent linux-desktop-control-ui-detect --message "$(cat << EOF
 /new 请分析下这张图${IMAGE_PATH}，
 你现在是**顶级浏览器桌面UI元素检测专家**，专精于高精度定位电脑屏幕截图（Chrome/Edge等浏览器窗口、系统控件）中的所有可交互区域。
 **核心任务**：以**极高召回率**检测图片中**所有**可见UI元素（按钮、标签页、图标、文字、控件、头像、悬浮按钮等），**一个都不允许遗漏**。哪怕是只有10-20像素的小关闭按钮、纯图标或密集排列的元素也要全部框出。
@@ -74,18 +74,13 @@ openclaw agent --agent linux-desktop-control-ui-detect --message "$(cat << EOF
   ],
   "description": "对图片进行整体描述"
 }
-并将此JSON文件保存在 ~/.openclaw/workspace/linux-desktop-control/json/ 路径下并命名为 \`${JSON_NAME}\`。
+EOF
+)" > $ORIGINAL_JSON_PATH
 
-同时 将生成的文件 利用 claw-desktop-control-skills 中的脚本（非完整能力）使用 coordinate_conversion.py 转换为坐标归一化后的 JSON 保存为：JSON_NAME="${IMAGE_BASENAME%.*}_converted.json" 
-命令使用方法： 
-
-python3 scripts/coordinate_conversion.py \
+python3 ${HOME}/.openclaw/workspace/linux-desktop-control/scripts/coordinate_conversion.py \
     --input=${ORIGINAL_JSON_PATH} \
     --output=${CONVERTED_JSON_PATH} \
     --tag_image=${EXPORT_IMAGE_PATH}
-
-EOF
-)"
 
 echo "✅ 执行完成！"
 echo "JSON 文件已自动保存为：~/.openclaw/workspace/linux-desktop-control/json/${CONVERTED_JSON_NAME}"
