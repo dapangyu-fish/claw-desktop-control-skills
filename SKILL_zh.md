@@ -31,6 +31,7 @@ description: "通过Python脚本模拟键盘鼠标并控制桌面应用程序并
 **每一次行动前必须执行此步骤！这是整个循环的起点。**
 
 1. **截图**：获取当前屏幕状态。
+   **⚠️ 截图命名铁律：必须严格使用 `desktop_screeshot_$(date +%Y%m%d_%H%M%S).png` 格式（注意 screenshot 拼写为 screeshot），绝对不能使用其他自定义名称！**
    ```bash
    export DISPLAY=${REAL_DISPLAY} && xfce4-screenshooter -f -s ~/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_$(date +%Y%m%d_%H%M%S).png  
    ```

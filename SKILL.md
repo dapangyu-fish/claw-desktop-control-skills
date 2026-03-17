@@ -31,6 +31,7 @@ Run the setup script to prepare the workspace and verify the environment.
 **This step MUST be executed before EVERY action! This is the starting point of the loop.**
 
 1. **Screenshot**: Capture the current screen state.
+   **⚠️ Screenshot Naming IRON RULE: You MUST strictly use the format `desktop_screeshot_$(date +%Y%m%d_%H%M%S).png` (Note the spelling 'screeshot'). You are ABSOLUTELY FORBIDDEN from using any other custom names!**
    ```bash
    export DISPLAY=${REAL_DISPLAY} && xfce4-screenshooter -f -s ~/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_$(date +%Y%m%d_%H%M%S).png
    ```
