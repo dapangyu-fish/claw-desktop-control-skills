@@ -41,7 +41,11 @@ Run the setup script to prepare the workspace and verify the environment.
    ```
    *(The script automatically generates `{original_image_name_without_extension}_converted.json` with absolute coordinates)*
 
-3. **State Assertion & Self-Correction based on converted.json**:
+3. **Read and Output Findings**:
+   - You **MUST** use the `Read` tool to read the generated `_converted.json` file.
+   - You **MUST** summarize to the user in the chat what you see on the screen (e.g., "I read the JSON, and I see a Chrome window with a search bar and several bookmarks...").
+
+4. **State Assertion & Self-Correction based on converted.json**:
    - **If starting a task**: Verify the initial state (e.g., is the desktop visible?).
    - **If an action was just performed**: **COMPARE screenshots/UI data before and after the action**.
      - *Example: Last step was "Open Browser". Is there a browser window on screen now? If not, action FAILED.*
@@ -107,19 +111,6 @@ python3 scripts/keyboard_control.py lines --file commands.txt
 python3 scripts/keyboard_control.py lines --text "Line 1 content\nLine 2 content\nLine 3 code"
 python3 scripts/keyboard_control.py lines --text "import os\nprint('hello world')\nprint('IME Decoupled!')\nexit()"
 
-# ==================== 3. Pro Tips ====================
-# Faster: Modify pyautogui.PAUSE = 0.05 in the script
-# More Stable: Change to 0.15
-# Emergency Stop: Move mouse quickly to the top-left corner (pyautogui FAILSAFE)
-# macOS uses command+v automatically, Windows/Linux uses ctrl+v
-
-# ==================== 4. One-Click Test All (Copy & Paste) ====================
-echo "=== Test Start ==="
-python3 scripts/keyboard_control.py press enter
-python3 scripts/keyboard_control.py hotkey ctrl v
-python3 scripts/keyboard_control.py type "Test Success! 👋" --enter
-python3 scripts/keyboard_control.py lines --text "Multi-line Test\nLine 2\nLine 3"
-echo "=== Test End ==="
 ```
 
 ### Phase 4: Loop

@@ -41,7 +41,11 @@ description: "通过Python脚本模拟键盘鼠标并控制桌面应用程序并
    ```
    *(脚本会自动生成 绝对值坐标化的 `{原始图片名称（不带后缀）}_converted.json`)*
 
-3. **根据截图状态转换的converted.json 断言 (State Assertion) & 自我修正**：
+3. **读取并输出分析结果**：
+   - **必须**使用 `Read` 工具读取生成的 `_converted.json` 文件。
+   - **必须**在对话中向用户总结你看到了什么（例如：“我读取了 JSON，当前屏幕上有一个 Chrome 窗口，包含搜索框和几个书签图标...”）。
+
+4. **根据截图状态转换的converted.json 断言 (State Assertion) & 自我修正**：
    - **如果是任务开始**：确认起始状态（如桌面是否显示）。
    - **如果刚执行了操作**：**必须对比操作前后的截图/UI数据**。
      - *示例：上一步是“打开浏览器”。现在屏幕上有浏览器窗口吗？如果没有，操作失败。*
@@ -120,25 +124,6 @@ python3 scripts/keyboard_control.py lines --file commands.txt
 python3 scripts/keyboard_control.py lines --text "第一行内容\n第二行内容\n第三行代码"
 python3 scripts/keyboard_control.py lines --text "import os\nprint('hello world')\nprint('输入法已解耦！')\nexit()"
 
-# ==================== 4. 进阶小技巧 ====================
-# 想更快：修改脚本里的 pyautogui.PAUSE = 0.05
-# 想更稳：改成 0.15
-# 紧急停止：把鼠标快速移到屏幕左上角（pyautogui FAILSAFE）
-# macOS 自动用 command+v，Windows/Linux 自动用 ctrl+v
-
-# ==================== 5. 一键测试所有功能（复制粘贴运行） ====================
-echo "=== 测试开始 ==="
-python3 scripts/keyboard_control.py press enter
-python3 scripts/keyboard_control.py hotkey ctrl v
-python3 scripts/keyboard_control.py type "测试成功！👋" --enter
-python3 scripts/keyboard_control.py lines --text "多行测试\n第2行\n第3行"
-echo "=== 测试结束 ==="
-
-# ================================================
-# 使用完后直接把这个文件保存为 README.md 或 help.md 即可
-# 以后每次用终端复制上面的命令就行！
-# 有问题直接改脚本里的 pyautogui.PAUSE 数值调节速度
-# ================================================
 ```
 
 ### 阶段 4：循环 (Loop)
