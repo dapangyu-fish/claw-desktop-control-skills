@@ -10,16 +10,6 @@ def get_project_root():
     """Returns the absolute path to the project root directory."""
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-def get_script_path(script_name):
-    """Returns the absolute path to a script in the scripts directory."""
-    return os.path.join(get_project_root(), 'scripts', script_name)
-
-def add_project_root_to_sys_path():
-    """Adds the project root to sys.path to allow importing modules from root."""
-    project_root = get_project_root()
-    if project_root not in sys.path:
-        sys.path.insert(0, project_root)
-
 # ====================== 智能中文字体 ======================
 def get_chinese_font(size: int = 24):
     project_root = get_project_root()
@@ -54,13 +44,18 @@ def convert_to_absolute(json_path: str, source_image_path: str, output_json_path
         norm_bbox = obj.get("bbox", [0, 0, 0, 0])
         x1, y1, x2, y2 = norm_bbox
 
-        abs_x1 = round(x1 / 1000 * orig_width)
-        abs_y1 = round(y1 / 1000 * orig_height)
-        abs_x2 = round(x2 / 1000 * orig_width)
-        abs_y2 = round(y2 / 1000 * orig_height)
+        # ==================== 关键修复：改用 int()（和你旧脚本完全一致） ====================
+        abs_x1 = int(x1 / 1000 * orig_width)
+        abs_y1 = int(y1 / 1000 * orig_height)
+        abs_x2 = int(x2 / 1000 * orig_width)
+        abs_y2 = int(y2 / 1000 * orig_height)
 
-        center_x = round((abs_x1 + abs_x2) / 2)
-        center_y = round((abs_y1 + abs_y2) / 2)
+        # 中心坐标也用 int()
+        center_x = int((abs_x1 + abs_x2) / 2)
+        center_y = int((abs_y1 + abs_y2) / 2)
+
+        # 调试打印（方便你检查是否对齐）
+        print(f"🔄 转换: norm[{x1},{y1},{x2},{y2}] → abs[{abs_x1},{abs_y1},{abs_x2},{abs_y2}] 中心({center_x},{center_y})")
 
         absolute_objects.append({
             "text": obj.get("text", "未命名元素"),
@@ -76,7 +71,7 @@ def convert_to_absolute(json_path: str, source_image_path: str, output_json_path
     return img, absolute_objects
 
 
-# ====================== 标注函数（已支持自定义输出路径） ======================
+# ====================== 标注函数 ======================
 def draw_annotations(img: Image.Image, absolute_objects: list, source_image_path: str, annotated_path: str = None):
     draw = ImageDraw.Draw(img, "RGBA")
     font = get_chinese_font(24)
@@ -93,28 +88,28 @@ def draw_annotations(img: Image.Image, absolute_objects: list, source_image_path
         label = f"Det-{i+1}: {text_content} | 中心:({cx},{cy})"
         draw.text((x1 + 5, y1 - 30), label, fill=(255, 0, 0, 255), font=font)
 
-        print(f"✅ 标注: {text_content} → 框[{x1},{y1},{x2},{y2}] 中心({cx},{cy})")
+        print(f"✅ 标注完成: {text_content} → 框[{x1},{y1},{x2},{y2}]")
 
-    # ==================== 自定义保存路径 ====================
+    # ==================== 保存标注图 ====================
     if annotated_path is None:
         p = Path(source_image_path)
         annotated_path = p.with_name(f"{p.stem}_annotated{p.suffix}")
 
     img.save(annotated_path)
-    print(f"🎉 标注图片已保存到你指定的位置: {annotated_path}")
-    img.show()  # 可选：本地预览
+    print(f"🎉 标注图片已保存: {annotated_path}")
+    img.show()  # 本地预览
 
 
 # ====================== 命令行 ======================
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="坐标转换 + 图片标注工具（--source_image 为原始图片）")
+    parser = argparse.ArgumentParser(description="坐标转换 + 图片标注工具（已修复错位问题）")
     parser.add_argument("--input", required=True, help="输入 JSON 文件（归一化 bbox）")
     parser.add_argument("--output", required=True, help="输出绝对坐标 JSON 文件路径")
-    parser.add_argument("--source_image", required=True, help="原始图片路径（必须真实存在，用于读取尺寸和作为标注底图）")
-    parser.add_argument("--annotated", default=None, help="标注图片保存路径（可选，不填则自动加 _annotated）")
+    parser.add_argument("--source_image", required=True, help="原始图片路径（必须真实存在）")
+    parser.add_argument("--annotated", default=None, help="标注图片保存路径（可选）")
     args = parser.parse_args()
 
-    # 执行转换
+    # 执行转换（现在用 int() 转换，和你旧脚本一致）
     img, abs_objects = convert_to_absolute(args.input, args.source_image, args.output)
     
     # 执行标注
