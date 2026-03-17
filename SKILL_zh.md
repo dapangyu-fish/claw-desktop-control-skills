@@ -41,7 +41,7 @@ description: "通过Python脚本模拟键盘鼠标并控制桌面应用程序并
    ```
    *(脚本会自动生成 绝对值坐标化的 `{原始图片名称（不带后缀）}_converted.json`)*
 
-3. **读取并输出分析结果,并做决策**：
+3. **读取并输出分析结果尝试执行下一步**：
    ```bash
    ./scripts/next_plan_prompt.sh  ~/.openclaw/workspace/linux-desktop-control/images/{图片名称}.png ${DISPLAY}
    ```
