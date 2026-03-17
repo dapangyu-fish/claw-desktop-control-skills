@@ -7,11 +7,11 @@
 #   ./get_next_plan_prompt.sh /home/fish/.openclaw/workspace/linux-desktop-control/images/desktop_screenshot_20260316_203530.png "我需要点击搜索框"
 # ================================================
 
-if [ "$#" -ne 2 ]; then
+if [ "$#" -ne 3 ]; then
     echo "正确用法: $0 <screenshot_path> <request_prompt> <display>"
     echo ""
     echo "示例:"
-    echo "  $0 /home/fish/.openclaw/workspace/linux-desktop-control/images/desktop_screenshot_20260316_203530.png \"Please find the search bar\""
+    echo "  $0 /home/fish/.openclaw/workspace/linux-desktop-control/images/desktop_screenshot_20260316_203530.png \"Please find the search bar\" :0"
     exit 1
 fi
 
