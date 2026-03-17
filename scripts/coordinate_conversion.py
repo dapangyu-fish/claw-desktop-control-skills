@@ -66,17 +66,22 @@ def convert_to_absolute(json_path: str, image_path: str, output_json_path: str):
         abs_x2 = round(x2 / 1000 * orig_width)
         abs_y2 = round(y2 / 1000 * orig_height)
 
+        # ==================== 新增：中心坐标（用于点击操作） ====================
+        center_x = round((abs_x1 + abs_x2) / 2)
+        center_y = round((abs_y1 + abs_y2) / 2)
+
         absolute_objects.append({
             "text": obj.get("text", "未命名元素"),
-            "bbox": [abs_x1, abs_y1, abs_x2, abs_y2]   # 绝对像素坐标
+            "bbox": [abs_x1, abs_y1, abs_x2, abs_y2],      # 绝对像素坐标
+            "center": [center_x, center_y]                 # 新增：中心坐标 (cx, cy)，方便后续点击
         })
 
-    # 保存绝对坐标 JSON
+    # 保存绝对坐标 JSON（现在包含中心坐标）
     result = {"objects": absolute_objects}
     with open(output_json_path, "w", encoding="utf-8") as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
 
-    print(f"✅ 绝对坐标 JSON 已保存: {output_json_path}")
+    print(f"✅ 绝对坐标 JSON 已保存: {output_json_path}（已新增 center 字段）")
     return img, absolute_objects
 
 
@@ -88,16 +93,17 @@ def draw_annotations(img: Image.Image, absolute_objects: list, tag_image_path: s
     for i, obj in enumerate(absolute_objects):
         x1, y1, x2, y2 = obj["bbox"]
         text_content = obj.get("text", "文字")
+        cx, cy = obj.get("center", [0, 0])  # 读取中心坐标（仅用于日志）
 
         # 红色半透明框 + 边框
         draw.rectangle([x1, y1, x2, y2],
                        outline=(255, 0, 0, 255), width=6, fill=(255, 0, 0, 50))
 
         # 标签文字（上方）
-        label = f"Det-{i+1}: {text_content}"
+        label = f"Det-{i+1}: {text_content} | 中心:({cx},{cy})"
         draw.text((x1 + 5, y1 - 30), label, fill=(255, 0, 0, 255), font=font)
 
-        print(f"✅ 标注: {text_content} → [{x1},{y1},{x2},{y2}]")
+        print(f"✅ 标注: {text_content} → 框[{x1},{y1},{x2},{y2}] 中心({cx},{cy})")
 
     # 自动保存标注图片（原文件名 + _annotated）
     p = Path(tag_image_path)
@@ -109,13 +115,13 @@ def draw_annotations(img: Image.Image, absolute_objects: list, tag_image_path: s
 
 # ====================== 命令行 ======================
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="坐标转换 + 图片标注工具（仅处理 JSON）")
+    parser = argparse.ArgumentParser(description="坐标转换 + 图片标注工具（新增中心坐标字段）")
     parser.add_argument("--input", required=True, help="输入 JSON 文件（归一化 bbox）")
     parser.add_argument("--output", required=True, help="输出绝对坐标 JSON 文件路径")
     parser.add_argument("--tag_image", required=True, help="原图路径（用于获取尺寸和绘制标注）")
     args = parser.parse_args()
 
-    # 执行转换
+    # 执行转换（现在每个对象都会包含 center）
     img, abs_objects = convert_to_absolute(args.input, args.tag_image, args.output)
 
     # 执行标注并保存
