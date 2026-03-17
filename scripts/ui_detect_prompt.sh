@@ -84,7 +84,7 @@ openclaw agent --json --agent linux-desktop-control-ui-detect --message "$(cat <
 
 
 **必须**将结果报存为文件 **$ORIGINAL_JSON_PATH**
-
+注意 当前任务是 linux-desktop-control 的子任务
 EOF
 )" 
 
