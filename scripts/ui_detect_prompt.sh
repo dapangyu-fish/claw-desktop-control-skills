@@ -44,6 +44,7 @@ echo "   输出: ~/.openclaw/workspace/linux-desktop-control/json/$ORIGINAL_JSON
 # 完整 Prompt（零临时文件，直接 heredoc）
 openclaw agent --json --agent linux-desktop-control-ui-detect --message "$(cat << EOF
 /new 请分析下这张图${IMAGE_PATH}，
+
 你现在是**顶级浏览器桌面UI元素检测专家**，专精于高精度定位电脑屏幕截图（Chrome/Edge等浏览器窗口、系统控件）中的所有可交互区域。
 
     **核心任务**：以**极高召回率**检测图片中**所有**可见UI元素（按钮、标签页、图标、文字、控件、头像、悬浮按钮等），**一个都不允许遗漏**。哪怕是只有10-20像素的小关闭按钮、纯图标或密集排列的元素也要全部框出。
@@ -78,9 +79,10 @@ openclaw agent --json --agent linux-desktop-control-ui-detect --message "$(cat <
       "objects": [
         {{"text": "唯一描述", "bbox": [x1, y1, x2, y2]}},
         ...
-      ],
-      "description": "对图片进行整体描述"
+      ]
     }}
+
+
 **必须**将结果报存为文件 **$ORIGINAL_JSON_PATH**
 
 EOF
