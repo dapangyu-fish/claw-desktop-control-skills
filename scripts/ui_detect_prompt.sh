@@ -27,7 +27,7 @@ fi
 
 # ==================== 自动生成 JSON 文件名 ====================
 IMAGE_BASENAME=$(basename "$IMAGE_PATH")
-EXPORT_IMAGE_NAME="${IMAGE_BASENAME%.*}_export.png" 
+EXPORT_IMAGE_NAME="${IMAGE_BASENAME%.*}_annotated.png" 
 ORIGINAL_JSON_NAME="${IMAGE_BASENAME%.*}_original.json" 
 CONVERTED_JSON_NAME="${IMAGE_BASENAME%.*}_converted.json" 
 EXPORT_IMAGE_PATH="${HOME}/openclaw/workspace/linux-desktop-control/images/${EXPORT_IMAGE_NAME}"
