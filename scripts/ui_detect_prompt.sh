@@ -74,8 +74,10 @@ openclaw agent --json --agent linux-desktop-control-ui-detect --message "$(cat <
   ],
   "description": "对图片进行整体描述"
 }
+**必须**将结果报存为文件 **$ORIGINAL_JSON_PATH**
+
 EOF
-)" > $ORIGINAL_JSON_PATH
+)" 
 
 python3 ${HOME}/.openclaw/workspace/linux-desktop-control/scripts/coordinate_conversion.py \
     --input=${ORIGINAL_JSON_PATH} \
