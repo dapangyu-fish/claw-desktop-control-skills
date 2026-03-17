@@ -69,6 +69,16 @@ openclaw agent --agent linux-desktop-control-ui-detect --message "$(cat << EOF
   ]
 }
 并将此JSON文件保存在 ~/.openclaw/workspace/linux-desktop-control/json/ 路径下并命名为 \`${JSON_NAME}\`。
+
+同时 将生成的文件 利用 claw-desktop-control-skills 中的脚本（非完整能力）使用 coordinate_conversion.py 转换为坐标归一化后的 JSON 保存为：JSON_NAME="${IMAGE_BASENAME%.*}_converted.json" 
+命令使用方法： 
+  ```bash
+   python3 scripts/coordinate_conversion.py \
+     --input=~/.openclaw/workspace/linux-desktop-control/json/{原始图片名称（不带后缀）}_original.json \
+     --output=~/.openclaw/workspace/linux-desktop-control/json/{原始图片名称（不带后缀）}_converted.json \
+     --tag_image=~/.openclaw/workspace/linux-desktop-control/json/{原始图片名称（不带后缀）}_export.json
+   ```
+
 EOF
 )"
 
