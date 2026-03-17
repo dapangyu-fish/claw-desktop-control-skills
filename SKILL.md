@@ -62,6 +62,60 @@ Run the setup script to prepare the workspace and verify the environment.
 **Tools Reference:**
 *(See below for command examples)*
 
+#### Keyboard Control
+```bash
+# ==================== 1. View Help ====================
+python3 scripts/keyboard_control.py --help
+python3 scripts/keyboard_control.py press --help
+python3 scripts/keyboard_control.py type --help
+python3 scripts/keyboard_control.py lines --help
+
+# ==================== 2. Command Examples ====================
+
+# Single Key Press
+python3 scripts/keyboard_control.py press enter
+python3 scripts/keyboard_control.py press space --presses 5
+python3 scripts/keyboard_control.py press f5
+python3 scripts/keyboard_control.py press esc
+
+# Hotkeys (Combinations)
+python3 scripts/keyboard_control.py hotkey ctrl c
+python3 scripts/keyboard_control.py hotkey ctrl v
+python3 scripts/keyboard_control.py hotkey ctrl alt delete
+python3 scripts/keyboard_control.py hotkey ctrl shift esc
+python3 scripts/keyboard_control.py hotkey win r
+
+# Type Text (Single Line) - Recommended
+python3 scripts/keyboard_control.py type "Hello World! 👋 123"
+python3 scripts/keyboard_control.py type "Login Successful" --enter
+python3 scripts/keyboard_control.py type 'print("Bypassed IME!")' --enter
+python3 scripts/keyboard_control.py type "Long text test: ABC123 + emoji 👋 + symbols @#$%" --enter
+
+# Type Multiple Lines (lines) - Best for Code
+# From File (Most Reliable)
+python3 scripts/keyboard_control.py lines --file code.py
+python3 scripts/keyboard_control.py lines --file script.sh
+python3 scripts/keyboard_control.py lines --file commands.txt
+
+# Direct Multi-line Text (use \n for newline)
+python3 scripts/keyboard_control.py lines --text "Line 1 content\nLine 2 content\nLine 3 code"
+python3 scripts/keyboard_control.py lines --text "import os\nprint('hello world')\nprint('IME Decoupled!')\nexit()"
+
+# ==================== 3. Pro Tips ====================
+# Faster: Modify pyautogui.PAUSE = 0.05 in the script
+# More Stable: Change to 0.15
+# Emergency Stop: Move mouse quickly to the top-left corner (pyautogui FAILSAFE)
+# macOS uses command+v automatically, Windows/Linux uses ctrl+v
+
+# ==================== 4. One-Click Test All (Copy & Paste) ====================
+echo "=== Test Start ==="
+python3 scripts/keyboard_control.py press enter
+python3 scripts/keyboard_control.py hotkey ctrl v
+python3 scripts/keyboard_control.py type "Test Success! 👋" --enter
+python3 scripts/keyboard_control.py lines --text "Multi-line Test\nLine 2\nLine 3"
+echo "=== Test End ==="
+```
+
 ### Phase 4: Loop
 - **Return to Phase 1**, untill the "Definition of Done" is met.
 

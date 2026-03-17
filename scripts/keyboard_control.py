@@ -2,12 +2,13 @@ import pyautogui
 import argparse
 import time
 import sys
-from typing import List, Literal
+import pyperclip
+from typing import List
+from platform import system as get_platform
 
 # ====================== 配置 ======================
-pyautogui.FAILSAFE = True          # 滑鼠移到左上角可緊急停止
-pyautogui.PAUSE = 0.08             # 操作間隔，更穩定
-pyautogui.KEYBOARD_KEYS = pyautogui.KEYBOARD_KEYS  # 讓 IDE 提示所有合法按鍵
+pyautogui.FAILSAFE = True
+pyautogui.PAUSE = 0.08
 
 # ====================== 核心函數 ======================
 def do_press_key(key: str, presses: int = 1, interval: float = 0.12):
@@ -22,79 +23,82 @@ def do_hotkey(*keys: str, interval: float = 0.08):
     print(f"✅ 組合鍵完成 → {' + '.join(keys)}")
 
 
-def do_type_text(text: str, interval: float = 0.04, enter: bool = False):
+def do_type_text(text: str, enter: bool = False):
     """
-    輸入一段文字（支援中文、日文、emoji、特殊符號、長文本）
-    interval 越小越快，但太小可能在遠端桌面丟字
+    【安全貼上模式】使用剪貼簿貼上文字
+    完全不受輸入法、Caps Lock、中文/日文/emoji 影響
+    你輸什麼，遠端就出現什麼（業界最穩解法）
     """
     if not text:
-        print("⚠️  沒有輸入文字，跳過")
+        print("⚠️ 沒有輸入文字，跳過")
         return
 
-    # pyautogui 不會自動切換輸入法，因此假設遠端已處於正確輸入法
-    pyautogui.write(text, interval=interval)
+    pyperclip.copy(text)
+    time.sleep(0.15)  # 重要緩衝時間
+
+    # 自動判斷作業系統貼上熱鍵
+    if get_platform() == "Darwin":  # macOS
+        do_hotkey("command", "v")
+    else:  # Windows / Linux
+        do_hotkey("ctrl", "v")
 
     if enter:
+        time.sleep(0.08)
         pyautogui.press("enter")
         extra = " + Enter"
     else:
         extra = ""
 
-    # 顯示前後截斷，避免 console 太長
-    display_text = (text[:60] + "...") if len(text) > 60 else text
-    print(f"✅ 輸入文字完成 → {display_text}{extra} (interval={interval}s)")
+    display_text = (text[:65] + "...") if len(text) > 65 else text
+    print(f"✅ [安全貼上] 完成 → {display_text}{extra}")
 
 
-def do_type_lines(lines: List[str], line_interval: float = 0.5, char_interval: float = 0.04):
-    """逐行輸入（適合貼上多行程式碼、對話等）"""
-    for i, line in enumerate(lines, 1):
-        do_type_text(line, interval=char_interval, enter=True)
-        if i < len(lines):
-            time.sleep(line_interval)
-    print(f"✅ 已完成 {len(lines)} 行文字輸入")
+def do_type_lines(lines: List[str], line_interval: float = 0.5):
+    """多行文字一次貼上（最穩、最快）"""
+    if not lines:
+        print("沒有內容可輸入")
+        return
+
+    full_text = "\n".join(lines)
+    do_type_text(full_text, enter=False)
+    print(f"✅ 已完成 {len(lines)} 行文字貼上（安全模式）")
 
 
 # ====================== 命令行入口 ======================
 def main():
-    parser = argparse.ArgumentParser(description="noVNC / 遠端桌面 鍵盤控制工具 - 命令行版")
+    parser = argparse.ArgumentParser(description="noVNC / 遠端桌面 鍵盤控制工具 - 安全版（輸入法解耦）")
     subparsers = parser.add_subparsers(dest='action', required=True, help="操作類型")
 
-    # ------------------ 模式1：單鍵 / 重複按鍵 ------------------
+    # 單鍵
     p_press = subparsers.add_parser('press', help='按單個鍵（可重複）')
     p_press.add_argument('key', type=str, help='按鍵名稱，例如: enter, space, a, F5, esc')
-    p_press.add_argument('--presses', type=int, default=1, help='重複次數')
-    p_press.add_argument('--interval', type=float, default=0.12, help='連續按之間隔')
+    p_press.add_argument('--presses', type=int, default=1)
+    p_press.add_argument('--interval', type=float, default=0.12)
 
-    # ------------------ 模式2：組合快捷鍵 ------------------
+    # 組合鍵
     p_hotkey = subparsers.add_parser('hotkey', help='按組合鍵，例如 Ctrl+Alt+Delete')
-    p_hotkey.add_argument('keys', nargs='+', type=str, help='按鍵列表，例如: ctrl alt delete')
-    p_hotkey.add_argument('--interval', type=float, default=0.08, help='按鍵間隔')
+    p_hotkey.add_argument('keys', nargs='+', type=str, help='例如: ctrl alt delete')
+    p_hotkey.add_argument('--interval', type=float, default=0.08)
 
-    # ------------------ 模式3：輸入文字 ------------------
-    p_type = subparsers.add_parser('type', help='輸入一段文字（支援中文/日文/emoji等）')
+    # 輸入文字（安全模式）
+    p_type = subparsers.add_parser('type', help='輸入一段文字（安全貼上，不受輸入法影響）')
     p_type.add_argument('text', type=str, help='要輸入的文字')
-    p_type.add_argument('--interval', type=float, default=0.04, help='每個字元間隔（秒）')
     p_type.add_argument('--enter', action='store_true', help='輸入完按 Enter')
 
-    # ------------------ 進階：多行輸入（適合貼程式碼、對話） ------------------
-    p_lines = subparsers.add_parser('lines', help='逐行輸入多行文字（每行自動 Enter）')
+    # 多行輸入（安全模式）
+    p_lines = subparsers.add_parser('lines', help='逐行輸入多行文字（安全貼上）')
     p_lines.add_argument('--file', type=str, help='從檔案讀取多行文字（優先）')
-    p_lines.add_argument('--text', type=str, help='直接傳入文字（用\\n分行）')
-    p_lines.add_argument('--line-interval', type=float, default=0.6, help='每行之間等待時間')
-    p_lines.add_argument('--char-interval', type=float, default=0.04, help='每個字元間隔')
+    p_lines.add_argument('--text', type=str, help='直接傳入文字（用 \\n 分行）')
+    p_lines.add_argument('--line-interval', type=float, default=0.6, help='每行之間等待時間（貼上模式下僅供參考）')
 
     args = parser.parse_args()
 
-    # 執行對應操作
     if args.action == 'press':
-        do_press_key(args.key, args.presses, args.interval)
-
+        do_press_key(args.key, getattr(args, 'presses', 1), getattr(args, 'interval', 0.12))
     elif args.action == 'hotkey':
-        do_hotkey(*args.keys, interval=args.interval)
-
+        do_hotkey(*args.keys, interval=getattr(args, 'interval', 0.08))
     elif args.action == 'type':
-        do_type_text(args.text, interval=args.interval, enter=args.enter)
-
+        do_type_text(args.text, enter=args.enter)
     elif args.action == 'lines':
         if args.file:
             try:
@@ -108,12 +112,7 @@ def main():
         else:
             print("錯誤：lines 模式必須提供 --file 或 --text", file=sys.stderr)
             sys.exit(1)
-
-        if not lines:
-            print("沒有內容可輸入")
-            return
-
-        do_type_lines(lines, args.line_interval, args.char_interval)
+        do_type_lines(lines, getattr(args, 'line_interval', 0.5))
 
 
 if __name__ == "__main__":
