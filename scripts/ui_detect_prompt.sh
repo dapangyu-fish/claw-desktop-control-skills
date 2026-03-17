@@ -82,7 +82,8 @@ EOF
 python3 ${HOME}/.openclaw/workspace/skills/claw-desktop-control-skills/scripts/coordinate_conversion.py \
     --input=${ORIGINAL_JSON_PATH} \
     --output=${CONVERTED_JSON_PATH} \
-    --tag_image=${EXPORT_IMAGE_PATH}
+    --source_image=${IMAGE_PATH} \
+    --annotated=${EXPORT_IMAGE_PATH}
 
 echo "✅ 执行完成！"
 echo "JSON 文件已自动保存为：~/.openclaw/workspace/linux-desktop-control/json/${CONVERTED_JSON_NAME}"
