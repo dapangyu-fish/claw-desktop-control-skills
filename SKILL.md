@@ -41,19 +41,23 @@ Run the setup script to prepare the workspace and verify the environment.
    ```
    *(The script automatically generates `{original_image_name_without_extension}_converted.json` with absolute coordinates)*
 
-3. **Read and Output Findings**:
-   - You **MUST** use the `Read` tool to read the generated `_converted.json` file.
-   - You **MUST** summarize to the user in the chat what you see on the screen (e.g., "I read the JSON, and I see a Chrome window with a search bar and several bookmarks...").
+3. **Read and Output Findings, then Decide**:
+   ```bash
+   ./scripts/next_plan_prompt.sh ~/.openclaw/workspace/linux-desktop-control/images/{original_image_name}.png ${DISPLAY}
+   ```
+   *(The script automatically generates `{original_image_name_without_extension}_converted.json` with absolute coordinates)*
+   **Note:** You **MUST** use the `TodoWrite` tool to explicitly output your thinking process and results based on the script's output.
 
-4. **State Assertion & Self-Correction based on converted.json**:
+4. **Re-assert State & Self-Correction based on converted.json**:
    - **If starting a task**: Verify the initial state (e.g., is the desktop visible?).
    - **If an action was just performed**: **COMPARE screenshots/UI data before and after the action**.
      - *Example: Last step was "Open Browser". Is there a browser window on screen now? If not, action FAILED.*
      - *Example: Last step was "Click Search Box". Is the input method active? Is there a cursor? If not, action FAILED.*
      - **Handling Failure**: If assertion fails, **DO NOT proceed to the next step**! Analyze the cause (e.g., click unresponsive, slow loading), try retrying, increasing wait time, or using keyboard shortcuts.
 
-### Phase 2: Plan & Decide
+### Phase 2: Plan Next Action
 **⚠️ You MUST use the `TodoWrite` tool to explicitly output your thinking process and next steps!**
+**⚠️ Before performing any action, you MUST announce to the user what you are about to do in the chat.**
 
 1. **Assess Current State**: Based on Phase 1's REAL state, determine the distance to the final goal.
 2. **Update Todo List**:
@@ -64,10 +68,6 @@ Run the setup script to prepare the workspace and verify the environment.
    - *Wrong*: "Click Search Bar -> Wait -> Type 'Lark' -> Enter". (This is scripting, FORBIDDEN!)
    - *Right*: "Current state: Search Bar not focused -> Plan: Click Search Bar at (x,y)". (Execute, then return to Phase 1 to verify focus, THEN plan typing).
 4. **Get Target Coordinates**: Find the target element's `bbox` center `(x, y)` from `_converted.json`.
-
-### Phase 3: Act
-1. **Execute Action**: Use `mouse_control.py` or `keyboard_control.py` to execute a **SINGLE** action.
-2. **Wait for Response**: Allow system reaction time (e.g., 2-5 seconds depending on app speed), usually implied in scripts or requires explicit `sleep`.
 
 **Tools Reference:**
 *(See below for command examples)*
