@@ -1,134 +1,119 @@
+import pyautogui
 import argparse
-import json
-from pathlib import Path
-from PIL import Image, ImageDraw, ImageFont
-
-import os
+import time
 import sys
+import pyperclip
+from typing import List
+from platform import system as get_platform
 
-def get_project_root():
-    """Returns the absolute path to the project root directory."""
-    # Assuming this file is in scripts/utils.py, so project root is one level up
-    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# ====================== 配置 ======================
+pyautogui.FAILSAFE = True
+pyautogui.PAUSE = 0.08
 
-def get_script_path(script_name):
-    """Returns the absolute path to a script in the scripts directory."""
-    return os.path.join(get_project_root(), 'scripts', script_name)
-
-def add_project_root_to_sys_path():
-    """Adds the project root to sys.path to allow importing modules from root."""
-    project_root = get_project_root()
-    if project_root not in sys.path:
-        sys.path.insert(0, project_root)
-
-# ====================== 智能中文字体 ======================
-def get_chinese_font(size: int = 24):
-    # 字体文件在项目根目录下
-    project_root = get_project_root()
-    font_path = os.path.join(project_root, "NotoSansSC-VariableFont_wght.ttf")
-    
-    font_candidates = [
-        font_path,
-        "./NotoSansSC-VariableFont_wght.ttf", # Fallback relative path
-    ]
-    for path in font_candidates:
-        try:
-            if path.endswith(".ttc"):
-                return ImageFont.truetype(path, size, index=0)
-            return ImageFont.truetype(path, size)
-        except:
-            continue
-    return ImageFont.load_default()
+# ====================== 核心函數 ======================
+def do_press_key(key: str, presses: int = 1, interval: float = 0.12):
+    """單個按鍵或重複按鍵"""
+    pyautogui.press(key, presses=presses, interval=interval)
+    print(f"✅ 按鍵完成 → '{key}' × {presses}")
 
 
-def convert_to_absolute(json_path: str, image_path: str, output_json_path: str):
-    # 加载原图获取真实尺寸
-    img = Image.open(image_path)
-    orig_width, orig_height = img.size
-    print(f"📏 原图尺寸: {orig_width}×{orig_height}")
-
-    # 加载输入 JSON（归一化 0~1000）
-    with open(json_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
-
-    objects = data.get("objects", [])
-    if not objects:
-        print("⚠️ JSON 中没有 objects 字段")
-
-    # ==================== 新增：透传顶层 description 字段 ====================
-    description = data.get("description")  # 直接读取（可能为 None）
-
-    # ==================== 坐标转换：归一化 → 绝对像素 ====================
-    absolute_objects = []
-    for obj in objects:
-        norm_bbox = obj.get("bbox", [0, 0, 0, 0])
-        x1, y1, x2, y2 = norm_bbox
-
-        abs_x1 = round(x1 / 1000 * orig_width)
-        abs_y1 = round(y1 / 1000 * orig_height)
-        abs_x2 = round(x2 / 1000 * orig_width)
-        abs_y2 = round(y2 / 1000 * orig_height)
-
-        # ==================== 新增：中心坐标（用于点击操作） ====================
-        center_x = round((abs_x1 + abs_x2) / 2)
-        center_y = round((abs_y1 + abs_y2) / 2)
-
-        absolute_objects.append({
-            "text": obj.get("text", "未命名元素"),
-            "bbox": [abs_x1, abs_y1, abs_x2, abs_y2],      # 绝对像素坐标
-            "center": [center_x, center_y]                 # 新增：中心坐标 (cx, cy)，方便后续点击
-        })
-
-    # 保存绝对坐标 JSON（透传 description + 新增 center）
-    result = {"objects": absolute_objects}
-    if description is not None:  # 只在存在时写入，避免多余的 null
-        result["description"] = description
-
-    with open(output_json_path, "w", encoding="utf-8") as f:
-        json.dump(result, f, ensure_ascii=False, indent=2)
-
-    print(f"✅ 绝对坐标 JSON 已保存: {output_json_path}（已新增 center 字段 + 透传 description）")
-    return img, absolute_objects
+def do_hotkey(*keys: str, interval: float = 0.08):
+    """同時按下多個按鍵（快捷鍵組合）"""
+    pyautogui.hotkey(*keys, interval=interval)
+    print(f"✅ 組合鍵完成 → {' + '.join(keys)}")
 
 
-def draw_annotations(img: Image.Image, absolute_objects: list, tag_image_path: str):
-    draw = ImageDraw.Draw(img, "RGBA")
-    font = get_chinese_font(24)
-    print("✅ 已加载中文字体")
+def do_type_text(text: str, enter: bool = False):
+    """
+    【安全貼上模式】使用剪貼簿貼上文字
+    完全不受輸入法、Caps Lock、中文/日文/emoji 影響
+    你輸什麼，遠端就出現什麼（業界最穩解法）
+    """
+    if not text:
+        print("⚠️ 沒有輸入文字，跳過")
+        return
 
-    for i, obj in enumerate(absolute_objects):
-        x1, y1, x2, y2 = obj["bbox"]
-        text_content = obj.get("text", "文字")
-        cx, cy = obj.get("center", [0, 0])  # 读取中心坐标（仅用于日志）
+    pyperclip.copy(text)
+    time.sleep(0.15)  # 重要緩衝時間
 
-        # 红色半透明框 + 边框
-        draw.rectangle([x1, y1, x2, y2],
-                       outline=(255, 0, 0, 255), width=6, fill=(255, 0, 0, 50))
+    # 自動判斷作業系統貼上熱鍵
+    if get_platform() == "Darwin":  # macOS
+        do_hotkey("command", "v")
+    else:  # Windows / Linux
+        do_hotkey("ctrl", "v")
 
-        # 标签文字（上方）
-        label = f"Det-{i+1}: {text_content} | 中心:({cx},{cy})"
-        draw.text((x1 + 5, y1 - 30), label, fill=(255, 0, 0, 255), font=font)
+    if enter:
+        time.sleep(0.08)
+        pyautogui.press("enter")
+        extra = " + Enter"
+    else:
+        extra = ""
 
-        print(f"✅ 标注: {text_content} → 框[{x1},{y1},{x2},{y2}] 中心({cx},{cy})")
-
-    # 自动保存标注图片（原文件名 + _annotated）
-    p = Path(tag_image_path)
-    annotated_path = p.with_name(f"{p.stem}_annotated{p.suffix}")
-    img.save(annotated_path)
-    print(f"🎉 标注图片已保存: {annotated_path}")
-    img.show()  # 可选：本地预览
+    display_text = (text[:65] + "...") if len(text) > 65 else text
+    print(f"✅ [安全貼上] 完成 → {display_text}{extra}")
 
 
-# ====================== 命令行 ======================
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="坐标转换 + 图片标注工具（新增 center + 透传 description）")
-    parser.add_argument("--input", required=True, help="输入 JSON 文件（归一化 bbox）")
-    parser.add_argument("--output", required=True, help="输出绝对坐标 JSON 文件路径")
-    parser.add_argument("--tag_image", required=True, help="原图路径（用于获取尺寸和绘制标注）")
+def do_type_lines(lines: List[str], line_interval: float = 0.5):
+    """多行文字一次貼上（最穩、最快）"""
+    if not lines:
+        print("沒有內容可輸入")
+        return
+
+    full_text = "\n".join(lines)
+    do_type_text(full_text, enter=False)
+    print(f"✅ 已完成 {len(lines)} 行文字貼上（安全模式）")
+
+
+# ====================== 命令行入口 ======================
+def main():
+    parser = argparse.ArgumentParser(description="noVNC / 遠端桌面 鍵盤控制工具 - 安全版（輸入法解耦）")
+    subparsers = parser.add_subparsers(dest='action', required=True, help="操作類型")
+
+    # 單鍵
+    p_press = subparsers.add_parser('press', help='按單個鍵（可重複）')
+    p_press.add_argument('key', type=str, help='按鍵名稱，例如: enter, space, a, F5, esc')
+    p_press.add_argument('--presses', type=int, default=1)
+    p_press.add_argument('--interval', type=float, default=0.12)
+
+    # 組合鍵
+    p_hotkey = subparsers.add_parser('hotkey', help='按組合鍵，例如 Ctrl+Alt+Delete')
+    p_hotkey.add_argument('keys', nargs='+', type=str, help='例如: ctrl alt delete')
+    p_hotkey.add_argument('--interval', type=float, default=0.08)
+
+    # 輸入文字（安全模式）
+    p_type = subparsers.add_parser('type', help='輸入一段文字（安全貼上，不受輸入法影響）')
+    p_type.add_argument('text', type=str, help='要輸入的文字')
+    p_type.add_argument('--enter', action='store_true', help='輸入完按 Enter')
+
+    # 多行輸入（安全模式）
+    p_lines = subparsers.add_parser('lines', help='逐行輸入多行文字（安全貼上）')
+    p_lines.add_argument('--file', type=str, help='從檔案讀取多行文字（優先）')
+    p_lines.add_argument('--text', type=str, help='直接傳入文字（用 \\n 分行）')
+    p_lines.add_argument('--line-interval', type=float, default=0.6, help='每行之間等待時間（貼上模式下僅供參考）')
+
     args = parser.parse_args()
 
-    # 执行转换（现在每个对象都会包含 center，且 description 自动透传）
-    img, abs_objects = convert_to_absolute(args.input, args.tag_image, args.output)
+    if args.action == 'press':
+        do_press_key(args.key, getattr(args, 'presses', 1), getattr(args, 'interval', 0.12))
+    elif args.action == 'hotkey':
+        do_hotkey(*args.keys, interval=getattr(args, 'interval', 0.08))
+    elif args.action == 'type':
+        do_type_text(args.text, enter=args.enter)
+    elif args.action == 'lines':
+        if args.file:
+            try:
+                with open(args.file, 'r', encoding='utf-8') as f:
+                    lines = [line.rstrip('\n') for line in f]
+            except Exception as e:
+                print(f"讀取檔案失敗：{e}", file=sys.stderr)
+                sys.exit(1)
+        elif args.text:
+            lines = args.text.split('\\n')
+        else:
+            print("錯誤：lines 模式必須提供 --file 或 --text", file=sys.stderr)
+            sys.exit(1)
+        do_type_lines(lines, getattr(args, 'line_interval', 0.5))
 
-    # 执行标注并保存
-    draw_annotations(img, abs_objects, args.tag_image)
+
+if __name__ == "__main__":
+    main()
