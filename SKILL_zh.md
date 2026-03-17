@@ -32,7 +32,7 @@ description: "通过Python脚本模拟键盘鼠标并控制桌面应用程序并
 
 1. **截图**：获取当前屏幕状态。
    ```bash
-   xfce4-screenshooter -f -s ~/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_$(date +%Y%m%d_%H%M%S).png
+   export DISPLAY=${REAL_DISPLAY} && xfce4-screenshooter -f -s ~/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_$(date +%Y%m%d_%H%M%S).png  
    ```
 
 2. **分析**：利用 `ui_detect_prompt.sh` 分析 UI 元素。

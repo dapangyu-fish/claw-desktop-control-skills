@@ -32,7 +32,7 @@ Run the setup script to prepare the workspace and verify the environment.
 
 1. **Screenshot**: Capture the current screen state.
    ```bash
-   xfce4-screenshooter -f -s ~/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_$(date +%Y%m%d_%H%M%S).png
+   export DISPLAY=${REAL_DISPLAY} && xfce4-screenshooter -f -s ~/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_$(date +%Y%m%d_%H%M%S).png
    ```
 
 2. **Analyze**: Use `ui_detect_prompt.sh` to analyze UI elements.
