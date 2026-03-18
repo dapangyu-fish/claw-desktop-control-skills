@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ================================================
-# OpenClaw Linux桌面UI检测脚本 - 单参数自动命名版
+# OpenClaw Linux桌面UI检测脚本 - 单参数自动命名版（带重试机制）
 # 用法: ./ui_detect.sh <图片完整路径>
 # 示例:
 #   ./ui_detect.sh desktop_screenshot_20260316_203530.png
@@ -9,16 +9,15 @@
 
 if [ "$#" -ne 1 ]; then
     echo "用法错误！只需一个参数（图片路径）。"
-    echo "正确用法: $0  <display>"
+    echo "正确用法: $0 <图片路径>"
     echo ""
     echo "示例:"
-    echo "  $0 :1"
+    echo "  $0 desktop_screenshot_20260316_203530.png"
     exit 1
 fi
 
-
 # 参数
-IMAGE_PATH=${HOME}/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_$(date +%Y%m%d_%H%M%S).png
+IMAGE_PATH="$1"                    # 使用用户传入的路径（原脚本此处逻辑不一致，已修正）
 DISPLAY="$1"
 
 # 截图流程
@@ -64,7 +63,6 @@ fi
 # ──────────────── 结果判断 ────────────────
 
 if [ $screenshot_success -eq 1 ]; then
-    #echo "截图已保存至：${IMAGE_PATH}"
     sleep 1
     # 可选：尝试复制到剪贴板
     if command -v wl-copy >/dev/null 2>&1; then
@@ -85,7 +83,6 @@ else
     exit 1
 fi
 
-
 # 检查图片是否存在
 if [ ! -f "$IMAGE_PATH" ]; then
     echo "错误：图片文件不存在: $IMAGE_PATH"
@@ -98,6 +95,7 @@ EXPORT_IMAGE_NAME="${IMAGE_BASENAME%.*}_annotated.png"
 ORIGINAL_JSON_NAME="${IMAGE_BASENAME%.*}_original.json" 
 CONVERTED_JSON_NAME="${IMAGE_BASENAME%.*}_converted.json" 
 TEMP_TXT_NAME="${IMAGE_BASENAME%.*}_temp.txt" 
+
 EXPORT_IMAGE_PATH="${HOME}/.openclaw/workspace/linux-desktop-control/images/${EXPORT_IMAGE_NAME}"
 ORIGINAL_JSON_PATH="${HOME}/.openclaw/workspace/linux-desktop-control/json/${ORIGINAL_JSON_NAME}"
 CONVERTED_JSON_PATH="${HOME}/.openclaw/workspace/linux-desktop-control/json/${CONVERTED_JSON_NAME}"
@@ -105,13 +103,24 @@ TEMP_TXT_PATH="${HOME}/.openclaw/workspace/linux-desktop-control/temp/${TEMP_TXT
 
 # 创建输出目录
 mkdir -p "$HOME/.openclaw/workspace/linux-desktop-control/json"
+mkdir -p "$HOME/.openclaw/workspace/linux-desktop-control/temp"
 
 echo "🚀 正在调用 openclaw agent 进行 UI 检测..."
-# echo "   图片: $IMAGE_PATH"
-# echo "   输出: ~/.openclaw/workspace/linux-desktop-control/json/$ORIGINAL_JSON_NAME"
 
-# 完整 Prompt（零临时文件，直接 heredoc）
-openclaw agent --json --agent linux-desktop-control-ui-detect --message "$(cat << EOF
+# ==================== 重试逻辑（新增核心部分） ====================
+MAX_RETRIES=3
+retry_count=0
+agent_success=0
+
+while [ $retry_count -lt $MAX_RETRIES ] && [ $agent_success -eq 0 ]; do
+    retry_count=$((retry_count + 1))
+    echo "尝试 $retry_count/$MAX_RETRIES 调用 openclaw agent..."
+
+    # 清理上次可能失败的文件（避免脏数据干扰）
+    rm -f "$ORIGINAL_JSON_PATH"
+
+    # 调用 openclaw agent（stderr 重定向到 temp，便于失败时排查）
+    openclaw agent --agent linux-desktop-control-ui-detect --message "$(cat << EOF
 /new 请分析下这张图${IMAGE_PATH}，
 
 你现在是**顶级浏览器桌面UI元素检测专家**，专精于高精度定位电脑屏幕截图（Chrome/Edge等浏览器窗口、系统控件）中的所有可交互区域。
@@ -153,17 +162,43 @@ openclaw agent --json --agent linux-desktop-control-ui-detect --message "$(cat <
     }}
     }}
 
-
-**必须**将结果报存为文件 **$ORIGINAL_JSON_PATH**
+**必须**将结果保存为文件 **$ORIGINAL_JSON_PATH**
 注意 当前任务是 linux-desktop-control 的子任务
 EOF
-)" > ${TEMP_TXT_PATH}
+)" > "${TEMP_TXT_PATH}" 2>&1
 
+    # 检查是否成功生成 JSON 文件（存在 + 非空）
+    if [ -f "$ORIGINAL_JSON_PATH" ] && [ -s "$ORIGINAL_JSON_PATH" ]; then
+        agent_success=1
+        echo "✅ openclaw agent 执行成功（第 $retry_count 次尝试）"
+    else
+        if [ $retry_count -lt $MAX_RETRIES ]; then
+            echo "⚠️ 第 $retry_count 次尝试失败（$ORIGINAL_JSON_PATH 未生成），等待 2 秒后重试..."
+            sleep 2
+        fi
+    fi
+done
+
+# 重试全部失败后的处理
+if [ $agent_success -eq 0 ]; then
+    echo "❌ 错误：经过 ${MAX_RETRIES} 次尝试后，仍未能生成 $ORIGINAL_JSON_PATH" >&2
+    echo "最后一次执行日志（含错误输出）：" >&2
+    echo "=========================================" >&2
+    cat "${TEMP_TXT_PATH}" >&2
+    echo "=========================================" >&2
+    echo "建议排查：" >&2
+    echo "  • openclaw agent 是否正常运行" >&2
+    echo "  • json 目录权限是否足够" >&2
+    echo "  • 模型是否能正确解析指令并保存文件" >&2
+    exit 1
+fi
+
+# ==================== 坐标转换 ====================
 python3 ${HOME}/.openclaw/workspace/skills/claw-desktop-control-skills/scripts/coordinate_conversion.py \
     --input=${ORIGINAL_JSON_PATH} \
     --output=${CONVERTED_JSON_PATH} \
     --source_image=${IMAGE_PATH} \
-    --annotated=${EXPORT_IMAGE_PATH} >> ${TEMP_TXT_PATH}
+    --annotated=${EXPORT_IMAGE_PATH} >> ${TEMP_TXT_PATH} 2>&1
 
 echo "✅ 执行完成！"
 echo "原始图片 文件已自动保存为：${IMAGE_PATH}"
