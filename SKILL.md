@@ -18,14 +18,7 @@ This skill allows controlling desktop applications and performing system operati
 2. **State-Driven**: **Every decision MUST be based on the current REAL screen state**, not on pre-conceived scripts or assumptions.
 3. **Atomic Action**: **Execute ONLY ONE atomic action at a time** (e.g., "Click Search Bar"), then IMMEDIATELY perform the Observe step for verification. **Generating multi-step code at once is STRICTLY FORBIDDEN!**
 4. **Verify or Die**: If the previous action failed to produce the expected screen change (e.g., window didn't open, input box didn't focus), **STOP the current path IMMEDIATELY, retry, or change strategy**. Do not pretend to succeed and continue.
-
-### Phase 0: Initialization
-Run the setup script to prepare the workspace and verify the environment.
-
-**Command:**
-```bash
-./setup.sh
-```
+5. **Use Integrated Atomic Scripts**: **Directly use the scripts provided in 'Atomic Actions'. DO NOT install any dependencies. DO NOT write any code yourself; this Skill has already integrated all atomic capabilities. STRICTLY FORBIDDEN to write custom code or use other tools.**
 
 ### Atomic Actions Introduction
 
