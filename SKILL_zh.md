@@ -27,48 +27,43 @@ description: "通过Python脚本模拟键盘鼠标并控制桌面应用程序并
 ./setup.sh
 ```
 
-### 阶段 1：观察 (Observe) & 验证 (Verify)
-**每一次行动前必须执行此步骤！这是整个循环的起点。**
 
-1. **截图**：获取当前屏幕状态。
-   **⚠️ 截图命名铁律：必须严格使用 `desktop_screeshot_$(date +%Y%m%d_%H%M%S).png` 格式（注意 screenshot 拼写为 screeshot），绝对不能使用其他自定义名称！**
-   ```bash
-   export DISPLAY=${REAL_DISPLAY} && xfce4-screenshooter -f -s ~/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_$(date +%Y%m%d_%H%M%S).png  
-   ```
+### 原子能力介绍 (Atomic Actions) 
 
-2. **分析**：利用 `ui_detect_prompt.sh` 分析 UI 元素。
-   ```bash
-   ./scripts/ui_detect_prompt.sh ~/.openclaw/workspace/linux-desktop-control/images/{图片名称}.png
-   ```
-   *(脚本会自动生成 绝对值坐标化的 `{原始图片名称（不带后缀）}_converted.json`)*
+## ****观察当前屏幕状态****
+    ```bash
+    ./scripts/ui_detect_prompt.sh ${DISPLAY}
+    ```
+    *(脚本会自动生成 绝对值坐标化的 以及图片描述信息的`{原始图片名称}_converted.json`)* 并在返回信息中体现
+    例如运行此脚本后：
+    ```bash
+    🚀 正在调用 openclaw agent 进行 UI 检测...
+    ✅ 执行完成！
+    处理过程中的临时文件已自动保存为：/home/fish/.openclaw/workspace/linux-desktop-control/temp/desktop_screeshot_20260318_132240_temp.txt
+    原始图片 文件已自动保存为：/home/fish/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_20260318_132240_annotated.png
+    坐标化 JSON 文件已自动保存为：/home/fish/.openclaw/workspace/linux-desktop-control/json/desktop_screeshot_20260318_132240_converted.json
+    ```
 
-3. **读取并输出分析结果尝试执行下一步**：
-   ```bash
-   ./scripts/next_plan_prompt.sh  ~/.openclaw/workspace/linux-desktop-control/images/{图片名称}.png ${DISPLAY}
-   ```
-   *(脚本会自动生成 绝对值坐标化的 `{原始图片名称（不带后缀）}_converted.json`)*
-   注意  必须使用 `TodoWrite` 上述工具来显式输出你的思考过程和结果
+## ****规划下一步行动****
+    此时需要通过“观察当前屏幕状态”生成的converted.json分析屏幕状态,结合需求,规划出下一步行动
+    以下示范每一行规划均为一步的规划行动内容，需要尽可能的具体和原子：
+    - 鼠标点击搜索栏
+    - 键盘输入“测试搜索内容” 并按回车
+    - 键盘仅输入“测试搜索内容” 不按回车
+    - 将某区域拖拽至另一个区域 （最好直接给出起点终点xy坐标）
+    - 按page down按键
+    - 按page up按键
+    - 按esc按键
+    - 按ctrl + c 按键
+    - 任务已经完全完成，不需要继续行动
 
-4. **再次根据截图状态转换的converted.json 断言 (State Assertion) & 自我修正**：
-   - **如果是任务开始**：确认起始状态（如桌面是否显示）。
-   - **如果刚执行了操作**：**必须对比操作前后的截图/UI数据**。
-     - *示例：上一步是“打开浏览器”。现在屏幕上有浏览器窗口吗？如果没有，操作失败。*
-     - *示例：上一步是“点击搜索框”。现在输入法激活了吗？有光标吗？如果没有，操作失败。*
-     - **失败处理**：如果断言失败，**不要继续下一步**！必须分析原因（如点击没反应、加载慢），尝试重试、增加等待时间或改用快捷键。
+## ****根据规划执行下一步行动****
+    ```bash
+    ./scripts/next_plan_prompt.sh  ~/.openclaw/workspace/linux-desktop-control/images/{图片名称}.png "规划的下一步具体行动" ${DISPLAY}
+    ```
 
-### 阶段 2：规划 (Plan) 下一步行动
-**⚠️ 必须使用 `TodoWrite` 工具来显式输出你的思考过程和下一步计划！**
-**⚠️ 在执行任何动作之前，必须先在对话中向用户说明接下来要做什么，并且必须原样输出即将执行的 bash 命令！**
-
-1. **当前状态评估**：根据阶段 1 的真实状态，判断距离最终目标还有多远。
-2. **更新 Todo 列表**：
-   - 将已完成的步骤标记为 `completed`。
-   - **新增**接下来的 1 个原子动作作为 `in_progress` 的任务。
-   - 保持 Todo 列表清晰，让用户能看到你正在做什么。
-3. **制定下一步**：**只规划接下来的 1 个原子动作**。
-   - *错误示范*：“点击搜索栏 -> 等待 -> 输入‘飞书’ -> 回车”。（这是脚本思维，禁止！）
-   - *正确示范*：“当前未聚焦搜索栏 -> 计划点击搜索栏坐标 (x,y)”。（执行后回到阶段 1 验证是否聚焦成功，然后再规划输入）
-4. **获取目标坐标**：从 `_converted.json` 中找到目标元素的 `bbox` 中心点 `(x, y)`。
+## ****验证行动是否成功执行****
+    这一步仍然是回到****观察当前屏幕状态**** 进行下一轮观察-验证-规划-执行的循环
 
 **工具参考：**
 
@@ -126,29 +121,3 @@ python3 scripts/keyboard_control.py lines --text "第一行内容\n第二行内�
 python3 scripts/keyboard_control.py lines --text "import os\nprint('hello world')\nprint('输入法已解耦！')\nexit()"
 
 ```
-
-### 阶段 4：循环 (Loop)
-- **回到 阶段 1**，直到满足“完成定义 (Definition of Done)”。
-
-## 完成定义 (Definition of Done)
-Agent 只有在满足以下条件时才能宣布任务完成：
-1. **最终目标达成**：屏幕上出现了明确的成功标志（如“安装完成”提示、目标应用已打开并显示主页）。
-2. **验证通过**：最后一次截图必须包含证明任务成功的视觉证据。
-3. **无遗留问题**：所有中间产生的临时窗口（如安装包管理器）已正确关闭（如果需要）。
-
-## 错误处理与重试策略
-1. **元素未找到**：如果 JSON 中没有目标元素，尝试滚动屏幕或检查是否在其他标签页/窗口。
-2. **操作无响应**：如果点击后屏幕无变化，尝试：
-   - 检查是否需要双击。
-   - 检查是否需要右键菜单。
-   - 尝试使用键盘快捷键（如 `Ctrl+L` 定位地址栏，`Super` 键打开菜单）。
-3. **应用未启动**：如果点击图标后应用未出现，尝试通过命令行启动（`RunCommand`）作为备选方案。
-```
-
-### 6. 验证 (Verification)
-执行完操作（鼠标点击或键盘输入）后，**必须验证结果**。
-
-**步骤：**
-1. 再次截图（参考步骤 1）。
-2. 分析新截图以确认预期变化是否发生（例如：窗口是否打开、文字是否输入、按钮是否点击）。
-3. 如果操作失败或结果不符合预期，请重试或调整策略。

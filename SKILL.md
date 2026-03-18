@@ -107,21 +107,3 @@ python3 scripts/keyboard_control.py lines --text "Line 1 content\nLine 2 content
 python3 scripts/keyboard_control.py lines --text "import os\nprint('hello world')\nprint('IME Decoupled!')\nexit()"
 
 ```
-
-### Phase 4: Loop
-- **Return to Phase 1**, untill the "Definition of Done" is met.
-
-## Definition of Done (DoD)
-The Agent can ONLY declare the task complete when:
-1. **Final Goal Achieved**: A clear success indicator appears on screen (e.g., "Installation Complete" message, target app opened and showing home page).
-2. **Verification Passed**: The last screenshot MUST contain visual evidence of success.
-3. **Clean State**: All intermediate temporary windows (e.g., package manager) are closed (if required).
-
-## Error Handling & Retry Strategy
-1. **Element Not Found**: If the target element is missing in JSON, try scrolling or checking other tabs/windows.
-2. **Action Unresponsive**: If screen doesn't change after clicking:
-   - Check if Double Click is needed.
-   - Check if Right Click menu is needed.
-   - Try Keyboard Shortcuts (e.g., `Ctrl+L` for address bar, `Super` key for menu).
-3. **App Not Starting**: If clicking an icon fails, try launching via command line (`RunCommand`) as a fallback.
-

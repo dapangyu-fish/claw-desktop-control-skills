@@ -4,20 +4,87 @@
 # OpenClaw Linux桌面UI检测脚本 - 单参数自动命名版
 # 用法: ./ui_detect.sh <图片完整路径>
 # 示例:
-#   ./ui_detect.sh /home/fish/.openclaw/workspace/linux-desktop-control/images/desktop_screenshot_20260316_203530.png
+#   ./ui_detect.sh desktop_screenshot_20260316_203530.png
 # ================================================
 
 if [ "$#" -ne 1 ]; then
     echo "用法错误！只需一个参数（图片路径）。"
-    echo "正确用法: $0 <screenshot_path>"
+    echo "正确用法: $0  <display>"
     echo ""
     echo "示例:"
-    echo "  $0 /home/fish/.openclaw/workspace/linux-desktop-control/images/desktop_screenshot_20260316_203530.png"
+    echo "  $0 :1"
     exit 1
 fi
 
+
 # 参数
-IMAGE_PATH="$1"
+IMAGE_PATH=${HOME}/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_$(date +%Y%m%d_%H%M%S).png
+DISPLAY="$1"
+
+# 截图流程
+set -euo pipefail
+
+screenshot_success=0
+
+# 1. grim (Wayland 主流)
+if command -v grim >/dev/null 2>&1; then
+    grim "${IMAGE_PATH}" && screenshot_success=1
+fi
+
+# 2. spectacle (KDE)
+if [ $screenshot_success -eq 0 ] && command -v spectacle >/dev/null 2>&1; then
+    spectacle -f -b -o "${IMAGE_PATH}" && screenshot_success=1
+fi
+
+# 3. scrot (X11 经典轻量工具)
+if [ $screenshot_success -eq 0 ] && command -v scrot >/dev/null 2>&1; then
+    scrot "${IMAGE_PATH}" && screenshot_success=1
+fi
+
+# 4. import (ImageMagick 兜底)
+if [ $screenshot_success -eq 0 ] && command -v import >/dev/null 2>&1; then
+    import -window root "${IMAGE_PATH}" && screenshot_success=1
+fi
+
+# 5. gnome-screenshot
+if [ $screenshot_success -eq 0 ] && command -v gnome-screenshot >/dev/null 2>&1; then
+    gnome-screenshot -f "${IMAGE_PATH}" && screenshot_success=1
+fi
+
+# 6. xfce4-screenshooter
+if [ $screenshot_success -eq 0 ] && command -v xfce4-screenshooter >/dev/null 2>&1; then
+    xfce4-screenshooter -f -s "${IMAGE_PATH}" && screenshot_success=1
+fi
+
+# 7. maim (现代 scrot 替代)
+if [ $screenshot_success -eq 0 ] && command -v maim >/dev/null 2>&1; then
+    maim --format png "${IMAGE_PATH}" && screenshot_success=1
+fi
+
+# ──────────────── 结果判断 ────────────────
+
+if [ $screenshot_success -eq 1 ]; then
+    #echo "截图已保存至：${IMAGE_PATH}"
+    sleep 1
+    # 可选：尝试复制到剪贴板
+    if command -v wl-copy >/dev/null 2>&1; then
+        wl-copy < "${IMAGE_PATH}"
+    elif command -v xclip >/dev/null 2>&1; then
+        xclip -selection clipboard -t image/png -i "${IMAGE_PATH}"
+    fi
+else
+    echo "错误：没有找到任何可用的截图工具" >&2
+    echo "请安装以下任一工具：" >&2
+    echo "  • grim          (Wayland)" >&2
+    echo "  • spectacle     (KDE)" >&2
+    echo "  • scrot         (X11 通用)" >&2
+    echo "  • ImageMagick   (import 命令)" >&2
+    echo "  • gnome-screenshot" >&2
+    echo "  • xfce4-screenshooter" >&2
+    echo "  • maim" >&2
+    exit 1
+fi
+
 
 # 检查图片是否存在
 if [ ! -f "$IMAGE_PATH" ]; then
@@ -30,16 +97,18 @@ IMAGE_BASENAME=$(basename "$IMAGE_PATH")
 EXPORT_IMAGE_NAME="${IMAGE_BASENAME%.*}_annotated.png" 
 ORIGINAL_JSON_NAME="${IMAGE_BASENAME%.*}_original.json" 
 CONVERTED_JSON_NAME="${IMAGE_BASENAME%.*}_converted.json" 
+TEMP_TXT_NAME="${IMAGE_BASENAME%.*}_temp.txt" 
 EXPORT_IMAGE_PATH="${HOME}/.openclaw/workspace/linux-desktop-control/images/${EXPORT_IMAGE_NAME}"
 ORIGINAL_JSON_PATH="${HOME}/.openclaw/workspace/linux-desktop-control/json/${ORIGINAL_JSON_NAME}"
 CONVERTED_JSON_PATH="${HOME}/.openclaw/workspace/linux-desktop-control/json/${CONVERTED_JSON_NAME}"
+TEMP_TXT_PATH="${HOME}/.openclaw/workspace/linux-desktop-control/temp/${TEMP_TXT_NAME}"
 
 # 创建输出目录
 mkdir -p "$HOME/.openclaw/workspace/linux-desktop-control/json"
 
 echo "🚀 正在调用 openclaw agent 进行 UI 检测..."
-echo "   图片: $IMAGE_PATH"
-echo "   输出: ~/.openclaw/workspace/linux-desktop-control/json/$ORIGINAL_JSON_NAME"
+# echo "   图片: $IMAGE_PATH"
+# echo "   输出: ~/.openclaw/workspace/linux-desktop-control/json/$ORIGINAL_JSON_NAME"
 
 # 完整 Prompt（零临时文件，直接 heredoc）
 openclaw agent --json --agent linux-desktop-control-ui-detect --message "$(cat << EOF
@@ -79,20 +148,24 @@ openclaw agent --json --agent linux-desktop-control-ui-detect --message "$(cat <
       "objects": [
         {{"text": "唯一描述", "bbox": [x1, y1, x2, y2]}},
         ...
-      ]
+      ],
+      "description": "对图片整体进行详细描述"
+    }}
     }}
 
 
 **必须**将结果报存为文件 **$ORIGINAL_JSON_PATH**
 注意 当前任务是 linux-desktop-control 的子任务
 EOF
-)" 
+)" > ${TEMP_TXT_PATH}
 
 python3 ${HOME}/.openclaw/workspace/skills/claw-desktop-control-skills/scripts/coordinate_conversion.py \
     --input=${ORIGINAL_JSON_PATH} \
     --output=${CONVERTED_JSON_PATH} \
     --source_image=${IMAGE_PATH} \
-    --annotated=${EXPORT_IMAGE_PATH}
+    --annotated=${EXPORT_IMAGE_PATH} >> ${TEMP_TXT_PATH}
 
 echo "✅ 执行完成！"
-echo "JSON 文件已自动保存为：~/.openclaw/workspace/linux-desktop-control/json/${CONVERTED_JSON_NAME}"
+echo "处理过程中的临时文件已自动保存为：${TEMP_TXT_PATH}"
+echo "原始图片 文件已自动保存为：${EXPORT_IMAGE_PATH}"
+echo "坐标化 JSON 文件已自动保存为：${CONVERTED_JSON_PATH}"
