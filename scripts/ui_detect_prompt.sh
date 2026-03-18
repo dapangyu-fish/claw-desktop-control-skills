@@ -166,6 +166,5 @@ python3 ${HOME}/.openclaw/workspace/skills/claw-desktop-control-skills/scripts/c
     --annotated=${EXPORT_IMAGE_PATH} >> ${TEMP_TXT_PATH}
 
 echo "✅ 执行完成！"
-echo "处理过程中的临时文件已自动保存为：${TEMP_TXT_PATH}"
-echo "原始图片 文件已自动保存为：${EXPORT_IMAGE_PATH}"
+echo "原始图片 文件已自动保存为：${IMAGE_PATH}"
 echo "坐标化 JSON 文件已自动保存为：${CONVERTED_JSON_PATH}"

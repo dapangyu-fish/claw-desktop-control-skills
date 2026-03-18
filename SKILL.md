@@ -95,8 +95,7 @@ Confirm initialization is successful
 ## Example return from this script
 # 🚀 Calling openclaw agent for UI detection...
 # ✅ Execution completed!
-# Temporary file during processing automatically saved to: /home/fish/.openclaw/workspace/linux-desktop-control/temp/desktop_screeshot_20260318_132240_temp.txt
-# Original image file automatically saved to: /home/fish/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_20260318_132240_annotated.png
+# Original image file automatically saved to: /home/fish/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_20260318_132240.png
 # Coordinate JSON file automatically saved to: /home/fish/.openclaw/workspace/linux-desktop-control/json/desktop_screeshot_20260318_132240_converted.json
 ```
 
@@ -117,8 +116,7 @@ I found the Applications icon in the top left corner. Based on experience, most 
 ## Example return from this script
 # 🚀 Calling openclaw agent for UI detection...
 # ✅ Execution completed!
-# Temporary file during processing automatically saved to: /home/fish/.openclaw/workspace/linux-desktop-control/temp/desktop_screeshot_20260318_131550_temp.txt
-# Original image file automatically saved to: /home/fish/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_20260318_131550_annotated.png
+# Original image file automatically saved to: /home/fish/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_20260318_131550.png
 # Coordinate JSON file automatically saved to: /home/fish/.openclaw/workspace/linux-desktop-control/json/desktop_screeshot_20260318_131550_converted.json
 ```
 ```system action
@@ -137,8 +135,7 @@ I found the Applications menu in the top left corner has been expanded, showing 
 ## Example return from this script
 # 🚀 Calling openclaw agent for UI detection...
 # ✅ Execution completed!
-# Temporary file during processing automatically saved to: /home/fish/.openclaw/workspace/linux-desktop-control/temp/desktop_screeshot_20260318_132345_temp.txt
-# Original image file automatically saved to: /home/fish/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_20260318_132345_annotated.png
+# Original image file automatically saved to: /home/fish/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_20260318_132345.png
 # Coordinate JSON file automatically saved to: /home/fish/.openclaw/workspace/linux-desktop-control/json/desktop_screeshot_20260318_132345_converted.json
 ```
 ```system action
@@ -165,8 +162,7 @@ The browser has started, indicating the system successfully clicked Web Browser.
 ## Example return from this script
 # 🚀 Calling openclaw agent for UI detection...
 # ✅ Execution completed!
-# Temporary file during processing automatically saved to: /home/fish/.openclaw/workspace/linux-desktop-control/temp/desktop_screeshot_20260318_135650_temp.txt
-# Original image file automatically saved to: /home/fish/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_20260318_135650_annotated.png
+# Original image file automatically saved to: /home/fish/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_20260318_135650.png
 # Coordinate JSON file automatically saved to: /home/fish/.openclaw/workspace/linux-desktop-control/json/desktop_screeshot_20260318_1315 50_converted.json
 ```
 ```system action

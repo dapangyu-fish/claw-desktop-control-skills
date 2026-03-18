@@ -91,8 +91,7 @@ export DISPLAY=:99.0
 ## 该脚本返回示范
 # 🚀 正在调用 openclaw agent 进行 UI 检测...
 # ✅ 执行完成！
-# 处理过程中的临时文件已自动保存为：/home/fish/.openclaw/workspace/linux-desktop-control/temp/desktop_screeshot_20260318_132240_temp.txt
-# 原始图片 文件已自动保存为：/home/fish/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_20260318_132240_annotated.png
+# 原始图片 文件已自动保存为：/home/fish/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_20260318_132240.png
 # 坐标化 JSON 文件已自动保存为：/home/fish/.openclaw/workspace/linux-desktop-control/json/desktop_screeshot_20260318_132240_converted.json
 ```
 
@@ -113,8 +112,7 @@ export DISPLAY=:99.0
 ## 该脚本返回示范
 # 🚀 正在调用 openclaw agent 进行 UI 检测...
 # ✅ 执行完成！
-# 处理过程中的临时文件已自动保存为：/home/fish/.openclaw/workspace/linux-desktop-control/temp/desktop_screeshot_20260318_131550_temp.txt
-# 原始图片 文件已自动保存为：/home/fish/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_20260318_131550_annotated.png
+# 原始图片 文件已自动保存为：/home/fish/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_20260318_131550.png
 # 坐标化 JSON 文件已自动保存为：/home/fish/.openclaw/workspace/linux-desktop-control/json/desktop_screeshot_20260318_131550_converted.json
 ```
 ```系统行为
@@ -133,8 +131,7 @@ export DISPLAY=:99.0
 ## 该脚本返回示范
 # 🚀 正在调用 openclaw agent 进行 UI 检测...
 # ✅ 执行完成！
-# 处理过程中的临时文件已自动保存为：/home/fish/.openclaw/workspace/linux-desktop-control/temp/desktop_screeshot_20260318_132345_temp.txt
-# 原始图片 文件已自动保存为：/home/fish/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_20260318_132345_annotated.png
+# 原始图片 文件已自动保存为：/home/fish/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_20260318_132345.png
 # 坐标化 JSON 文件已自动保存为：/home/fish/.openclaw/workspace/linux-desktop-control/json/desktop_screeshot_20260318_132345_converted.json
 ```
 ```系统行为
@@ -161,8 +158,7 @@ export DISPLAY=:99.0
 ## 该脚本返回示范
 # 🚀 正在调用 openclaw agent 进行 UI 检测...
 # ✅ 执行完成！
-# 处理过程中的临时文件已自动保存为：/home/fish/.openclaw/workspace/linux-desktop-control/temp/desktop_screeshot_20260318_135650_temp.txt
-# 原始图片 文件已自动保存为：/home/fish/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_20260318_135650_annotated.png
+# 原始图片 文件已自动保存为：/home/fish/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_20260318_135650.png
 # 坐标化 JSON 文件已自动保存为：/home/fish/.openclaw/workspace/linux-desktop-control/json/desktop_screeshot_20260318_1315 50_converted.json
 ```
 ```系统行为
