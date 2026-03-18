@@ -19,14 +19,6 @@ description: "通过Python脚本模拟键盘鼠标并控制桌面应用程序并
 3. **原子操作 (Atomic Action)**：**每次只执行一个原子动作**（如“点击搜索栏”），然后必须立即重新观察行验证的步骤。**严禁一次性生成多步操作代码！**
 4. **验证即通过 (Verify or Die)**：如果上一步操作未能产生预期的屏幕变化（如窗口未打开、输入框未聚焦），**必须立即停止当前路径，进行重试或更换策略**，绝不允许假装成功继续执行。
 
-### 阶段 0：初始化 (Initialization)
-运行 setup 脚本来准备工作空间并验证环境。
-
-**命令：**
-```bash
-./setup.sh
-```
-
 
 ### 原子能力介绍 (Atomic Actions) 
 
@@ -65,7 +57,122 @@ description: "通过Python脚本模拟键盘鼠标并控制桌面应用程序并
 ## ****验证行动是否成功执行****
     这一步仍然是回到****观察当前屏幕状态**** 进行下一轮观察-验证-规划-执行的循环
 
-**工具参考：**
+# 典型工作流介绍(案例中行为均为示例，不代表真实输入和返回)
+```用户prompt
+使用linux-desktop-control的能力，打开浏览器，访问google.com
+```
+### 阶段 0：初始化 (Initialization)
+运行 setup 脚本来准备工作空间并验证环境。
+
+```系统行为
+./setup.sh
+```
+
+```系统返回
+当前尚未设置DISPLAY环境变量，请先设置DISPLAY环境变量
+```
+
+```用户prompt
+:99.0
+```
+
+```系统行为
+export DISPLAY=:99.0
+./setup.sh
+确认初始化成功
+```
+
+
+### 阶段 1：观察当前屏幕状态 (Initialization)
+运行 setup 脚本来准备工作空间并验证环境。
+
+```系统行为
+./scripts/ui_detect_prompt.sh :99.0
+## 该脚本返回示范
+# 🚀 正在调用 openclaw agent 进行 UI 检测...
+# ✅ 执行完成！
+# 处理过程中的临时文件已自动保存为：/home/fish/.openclaw/workspace/linux-desktop-control/temp/desktop_screeshot_20260318_132240_temp.txt
+# 原始图片 文件已自动保存为：/home/fish/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_20260318_132240_annotated.png
+# 坐标化 JSON 文件已自动保存为：/home/fish/.openclaw/workspace/linux-desktop-control/json/desktop_screeshot_20260318_132240_converted.json
+```
+
+### 阶段 2：规划下一步行动 (Plan Next Action)
+```系统行为
+通过解析 /home/fish/.openclaw/workspace/linux-desktop-control/json/desktop_screeshot_20260318_132240_converted.json 发现当前屏幕是一个桌面首页，可能是xface桌面环境
+发现左上角有Appliciations图标，根据经验大部分软件应该可以在此找到，因此规划下一步计划 “点击左上角的Appliciations图标”
+```
+
+### 阶段 3：根据规划执行下一步行动 (Execute Next Action Based on Plan)
+```系统行为
+./scripts/next_plan_prompt.sh  ~/.openclaw/workspace/linux-desktop-control/images/{图片名称}.png "点击左上角的Appliciations图标" :99.0
+```
+
+### 阶段 4：验证行动是否成功执行 (Verify Execute Next Action Based on Plan)
+```系统行为
+./scripts/ui_detect_prompt.sh :99.0
+## 该脚本返回示范
+# 🚀 正在调用 openclaw agent 进行 UI 检测...
+# ✅ 执行完成！
+# 处理过程中的临时文件已自动保存为：/home/fish/.openclaw/workspace/linux-desktop-control/temp/desktop_screeshot_20260318_131550_temp.txt
+# 原始图片 文件已自动保存为：/home/fish/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_20260318_131550_annotated.png
+# 坐标化 JSON 文件已自动保存为：/home/fish/.openclaw/workspace/linux-desktop-control/json/desktop_screeshot_20260318_131550_converted.json
+```
+```系统行为
+通过解析 /home/fish/.openclaw/workspace/linux-desktop-control/json/desktop_screeshot_20260318_131550_converted.json 发现当前屏幕是一个桌面首页，可能是xface桌面环境
+发现左上角有Appliciations已经展开，并且出现了Run Program...、Terminal Emulator、Settings、Web Browser等选项，说明系统点击了Appliciations执行成功，那么可以直接规划下一步行为，根据用户最初的要求，最快速的要求是直接打开浏览器，因此规划下一步计划 “点击 Web Browser”
+```
+
+### 阶段 5：根据规划执行下一步行动 (Execute Next Action Based on Plan)
+```系统行为
+./scripts/next_plan_prompt.sh  ~/.openclaw/workspace/linux-desktop-control/images/{图片名称}.png "点击 Web Browser" :99.0
+```
+
+### 阶段 6：根据行动是否成功执行 (Verify Execute Next Next Action Based on Plan)
+```系统行为
+./scripts/ui_detect_prompt.sh ${DISPLAY}
+## 该脚本返回示范
+# 🚀 正在调用 openclaw agent 进行 UI 检测...
+# ✅ 执行完成！
+# 处理过程中的临时文件已自动保存为：/home/fish/.openclaw/workspace/linux-desktop-control/temp/desktop_screeshot_20260318_132345_temp.txt
+# 原始图片 文件已自动保存为：/home/fish/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_20260318_132345_annotated.png
+# 坐标化 JSON 文件已自动保存为：/home/fish/.openclaw/workspace/linux-desktop-control/json/desktop_screeshot_20260318_132345_converted.json
+```
+```系统行为
+通过解析 /home/fish/.openclaw/workspace/linux-desktop-control/json/desktop_screeshot_20260318_132345_converted.json 发现当前屏幕是浏览器
+发现浏览器已经启动，说明系统点击了Web Browser执行成功，那么可以直接规划下一步行为，根据用户最初的要求，最快速的要求是在浏览器地址栏内输入谷歌的网址，因此规划下一步计划 “在浏览器地址栏内输入 https://www.google.com 并按回车”
+```
+
+### 阶段 7：根据规划执行下一步行动 (Execute Next Action Based on Plan)
+```系统行为
+./scripts/next_plan_prompt.sh  ~/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_20260318_160557.png "在浏览器地址栏内输入 https://www.google.com 并按回车" :99.0
+## 该脚本返回示范
+# 🚀 分析下一步动作...
+# 
+# 🦞 OpenClaw 2026.3.13 (61d171a) — More integrations than your therapist's intake form.
+# 
+# │
+# ◇
+# 已完成操作：成功定位到浏览器地址栏（坐标635,88），点击激活后输入了`https://www.google.com`并按下回车键，页面正在跳转加载Google首页。
+```
+
+### 阶段 8：验证行动是否成功执行 (Verify Execute Next Action Based on Plan)
+```系统行为
+./scripts/ui_detect_prompt.sh :99.0
+## 该脚本返回示范
+# 🚀 正在调用 openclaw agent 进行 UI 检测...
+# ✅ 执行完成！
+# 处理过程中的临时文件已自动保存为：/home/fish/.openclaw/workspace/linux-desktop-control/temp/desktop_screeshot_20260318_135650_temp.txt
+# 原始图片 文件已自动保存为：/home/fish/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_20260318_135650_annotated.png
+# 坐标化 JSON 文件已自动保存为：/home/fish/.openclaw/workspace/linux-desktop-control/json/desktop_screeshot_20260318_1315 50_converted.json
+```
+```系统行为
+通过解析 /home/fish/.openclaw/workspace/linux-desktop-control/json/desktop_screeshot_20260318_135650_converted.json 发现当前屏幕已经打开了Google页面
+确认浏览器已经打开了Google页面，并且出现搜索框、登陆等选项，说明系统"在浏览器地址栏内输入 https://www.google.com 并按回车"执行成功，由于用户终极目标就是打开Google页面，因此任务完成，流程结束
+```
+
+
+
+**工具参考：一般情况只给子agent用**
 
 #### 鼠标控制 (Mouse Control)
 ```bash

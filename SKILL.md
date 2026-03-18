@@ -66,7 +66,7 @@ Run the setup script to prepare the workspace and verify the environment.
 
 # Typical Workflow Introduction (Actions in this case are examples only, not real inputs/outputs)
 ```user prompt
-Use linux-desktop-control to open the browser, visit google.com, and search for the latest news about Elon Musk
+Use linux-desktop-control to open the browser, visit google.com
 ```
 ### Phase 0: Initialization
 Run the setup script to prepare the workspace and verify the environment.
