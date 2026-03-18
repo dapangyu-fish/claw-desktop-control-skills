@@ -64,7 +64,118 @@ Run the setup script to prepare the workspace and verify the environment.
 ## ****Verify if Action was Successfully Executed****
     This step still goes back to ****Observe Current Screen State**** to carry out the next round of observe-verify-plan-execute loop.
 
-**Tools Reference:**
+# Typical Workflow Introduction (Actions in this case are examples only, not real inputs/outputs)
+```user prompt
+Use linux-desktop-control to open the browser, visit google.com, and search for the latest news about Elon Musk
+```
+### Phase 0: Initialization
+Run the setup script to prepare the workspace and verify the environment.
+
+```system action
+./setup.sh
+```
+
+```system response
+The DISPLAY environment variable is not set currently. Please set the DISPLAY environment variable first.
+```
+
+```user prompt
+:99.0
+```
+
+```system action
+export DISPLAY=:99.0
+./setup.sh
+Confirm initialization is successful
+```
+
+### Phase 1: Observe Current Screen State
+```system action
+./scripts/ui_detect_prompt.sh :99.0
+## Example return from this script
+# 🚀 Calling openclaw agent for UI detection...
+# ✅ Execution completed!
+# Temporary file during processing automatically saved to: /home/fish/.openclaw/workspace/linux-desktop-control/temp/desktop_screeshot_20260318_132240_temp.txt
+# Original image file automatically saved to: /home/fish/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_20260318_132240_annotated.png
+# Coordinate JSON file automatically saved to: /home/fish/.openclaw/workspace/linux-desktop-control/json/desktop_screeshot_20260318_132240_converted.json
+```
+
+### Phase 2: Plan Next Action
+```system action
+By parsing /home/fish/.openclaw/workspace/linux-desktop-control/json/desktop_screeshot_20260318_132240_converted.json, I found the current screen is a desktop home page, possibly xfce desktop environment.
+I found the Applications icon in the top left corner. Based on experience, most software can be found here, so I plan the next step: "Click the Applications icon in the top left corner"
+```
+
+### Phase 3: Execute Next Action Based on Plan
+```system action
+./scripts/next_plan_prompt.sh  ~/.openclaw/workspace/linux-desktop-control/images/{image_name}.png "Click the Applications icon in the top left corner" :99.0
+```
+
+### Phase 4: Verify Execute Next Action Based on Plan
+```system action
+./scripts/ui_detect_prompt.sh :99.0
+## Example return from this script
+# 🚀 Calling openclaw agent for UI detection...
+# ✅ Execution completed!
+# Temporary file during processing automatically saved to: /home/fish/.openclaw/workspace/linux-desktop-control/temp/desktop_screeshot_20260318_131550_temp.txt
+# Original image file automatically saved to: /home/fish/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_20260318_131550_annotated.png
+# Coordinate JSON file automatically saved to: /home/fish/.openclaw/workspace/linux-desktop-control/json/desktop_screeshot_20260318_131550_converted.json
+```
+```system action
+By parsing /home/fish/.openclaw/workspace/linux-desktop-control/json/desktop_screeshot_20260318_131550_converted.json, I found the current screen is a desktop home page, possibly xfce desktop environment.
+I found the Applications menu in the top left corner has been expanded, showing options like Run Program..., Terminal Emulator, Settings, Web Browser, etc. This indicates the system successfully clicked Applications. Now I can directly plan the next action. Based on the user's initial request, the fastest way is to directly open the browser, so I plan the next step: "Click Web Browser"
+```
+
+### Phase 5: Execute Next Action Based on Plan
+```system action
+./scripts/next_plan_prompt.sh  ~/.openclaw/workspace/linux-desktop-control/images/{image_name}.png "Click Web Browser" :99.0
+```
+
+### Phase 6: Verify Execute Next Next Action Based on Plan
+```system action
+./scripts/ui_detect_prompt.sh ${DISPLAY}
+## Example return from this script
+# 🚀 Calling openclaw agent for UI detection...
+# ✅ Execution completed!
+# Temporary file during processing automatically saved to: /home/fish/.openclaw/workspace/linux-desktop-control/temp/desktop_screeshot_20260318_132345_temp.txt
+# Original image file automatically saved to: /home/fish/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_20260318_132345_annotated.png
+# Coordinate JSON file automatically saved to: /home/fish/.openclaw/workspace/linux-desktop-control/json/desktop_screeshot_20260318_132345_converted.json
+```
+```system action
+By parsing /home/fish/.openclaw/workspace/linux-desktop-control/json/desktop_screeshot_20260318_132345_converted.json, I found the current screen is a browser.
+The browser has started, indicating the system successfully clicked Web Browser. Now I can directly plan the next action. Based on the user's initial request, the fastest way is to enter the Google URL in the browser address bar, so I plan the next step: "Enter https://www.google.com in the browser address bar and press Enter"
+```
+
+### Phase 7: Execute Next Action Based on Plan
+```system action
+./scripts/next_plan_prompt.sh  ~/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_20260318_160557.png "Enter https://www.google.com in the browser address bar and press Enter" :99.0
+## Example return from this script
+# 🚀 Analyzing next action...
+# 
+# 🦞 OpenClaw 2026.3.13 (61d171a) — More integrations than your therapist's intake form.
+# 
+# │
+# ◇
+# Completed action: Successfully located the browser address bar (coordinates 635,88), clicked to activate, typed `https://www.google.com`, and pressed Enter. The page is jumping to load the Google homepage.
+```
+
+### Phase 8: Verify Execute Next Action Based on Plan
+```system action
+./scripts/ui_detect_prompt.sh :99.0
+## Example return from this script
+# 🚀 Calling openclaw agent for UI detection...
+# ✅ Execution completed!
+# Temporary file during processing automatically saved to: /home/fish/.openclaw/workspace/linux-desktop-control/temp/desktop_screeshot_20260318_135650_temp.txt
+# Original image file automatically saved to: /home/fish/.openclaw/workspace/linux-desktop-control/images/desktop_screeshot_20260318_135650_annotated.png
+# Coordinate JSON file automatically saved to: /home/fish/.openclaw/workspace/linux-desktop-control/json/desktop_screeshot_20260318_1315 50_converted.json
+```
+```system action
+By parsing /home/fish/.openclaw/workspace/linux-desktop-control/json/desktop_screeshot_20260318_135650_converted.json, I found the Google page is already open on the screen.
+Confirmed that the browser has opened the Google page, and options like the search box and login have appeared. This indicates the system successfully executed "Enter https://www.google.com in the browser address bar and press Enter". Since the user's ultimate goal is to open the Google page, the task is complete and the workflow ends.
+```
+
+
+**Tools Reference: Generally for sub-agent use only**
 *(See below for command examples)*
 
 #### Keyboard Control
