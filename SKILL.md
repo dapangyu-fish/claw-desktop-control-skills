@@ -14,9 +14,9 @@ This skill allows controlling desktop applications and performing system operati
 ## Core Workflow: OODA Loop (Observe-Orient-Decide-Act)
 
 **⚠️ CRITICAL RULES for Agent:**
-1. **Closed-Loop Control**: This Skill MUST function like a human using a computer, **strictly following the "Screenshot -> Analyze -> Decide -> Act -> Verify" single-step loop** (Except for linux-desktop-control subtasks; unless otherwise specified, treat it as a subtask).
+1. **Closed-Loop Control**: This Skill MUST function like a human using a computer, **strictly following the "Observe -> Analyze -> Decide -> Act -> Verify" single-step loop** (Except for linux-desktop-control subtasks; unless otherwise specified, treat it as a subtask).
 2. **State-Driven**: **Every decision MUST be based on the current REAL screen state**, not on pre-conceived scripts or assumptions.
-3. **Atomic Action**: **Execute ONLY ONE atomic action at a time** (e.g., "Click Search Bar"), then IMMEDIATELY re-verify. **Generating multi-step code at once is STRICTLY FORBIDDEN!**
+3. **Atomic Action**: **Execute ONLY ONE atomic action at a time** (e.g., "Click Search Bar"), then IMMEDIATELY perform the Observe step for verification. **Generating multi-step code at once is STRICTLY FORBIDDEN!**
 4. **Verify or Die**: If the previous action failed to produce the expected screen change (e.g., window didn't open, input box didn't focus), **STOP the current path IMMEDIATELY, retry, or change strategy**. Do not pretend to succeed and continue.
 
 ### Phase 0: Initialization
