@@ -51,6 +51,10 @@ def draw_annotations(image_path: str, result: dict, output_path: str = None):
     orig_width, orig_height = img.size
     print(f"📏 原图尺寸: {orig_width}×{orig_height}")
 
+    # 确保图片模式为 RGBA 以便绘制半透明效果
+    if img.mode != "RGBA":
+        img = img.convert("RGBA")
+
     draw = ImageDraw.Draw(img, "RGBA")
     font = get_chinese_font(24)
     print("✅ 已加载中文字体")
@@ -70,6 +74,19 @@ def draw_annotations(image_path: str, result: dict, output_path: str = None):
 
     if output_path is None:
         output_path = str(Path(image_path).with_name(f"{Path(image_path).stem}_annotated.jpg"))
+
+    # 根据输出文件格式进行适当的模式转换
+    save_path = Path(output_path)
+    suffix = save_path.suffix.lower()
+
+    if suffix in [".jpg", ".jpeg"]:
+        # JPG 不支持透明度，转换为 RGB
+        if img.mode in ("RGBA", "LA", "P"):
+            img = img.convert("RGB")
+    else:
+        # 其他格式（如 PNG）保持 RGBA
+        if img.mode != "RGBA":
+            img = img.convert("RGBA")
 
     img.save(output_path)
     print(f"🎉 标注图片已保存: {output_path}")
